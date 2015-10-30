@@ -1,4 +1,4 @@
-package utils
+package ca.fourofclubs.utils
 import Math._
 
 /** A complex number
