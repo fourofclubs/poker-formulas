@@ -1,5 +1,5 @@
 package ca.fourofclubs.utils
-import Math._
+import java.lang.Math._
 
 /** A complex number
  *  @param a The real part.
