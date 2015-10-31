@@ -1,4 +1,4 @@
-package ca.fourofclubs.utils
+package ca.fourofclubs.utils.math
 import java.lang.Math._
 
 /** A complex number
