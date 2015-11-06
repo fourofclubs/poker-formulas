@@ -1,12 +1,20 @@
-package utils
+package ca.fourofclubs.utils.math
 import Complex._
+import Math._
+import Rational._
 
 object scratch {
-  val z = new Complex(1, 2)                       //> z  : utils.Complex = 1+2i
-  val w = new Complex(2, -1)                      //> w  : utils.Complex = 2-i
-  z + 3 * w                                       //> res0: utils.Complex = 7.0-i
-  ~w - z                                          //> res1: utils.Complex = 1-i
-  z ^ 3                                           //> res2: utils.Complex = -11-2i
-  ((w ^ 2) - w).re                                //> res3: BigDecimal = 1
-  (z ^ 2) + ~z + i                                //> res4: utils.Complex = -2+3i
+  Complex(1, 2)                                   //> res0: ca.fourofclubs.utils.math.Complex = 1+2i
+  val one = Zero.successor                        //> one  : ca.fourofclubs.utils.math.Nat = 0+1
+  val two = one + one                             //> two  : ca.fourofclubs.utils.math.Nat = 0+1+1
+  val three = two + one                           //> three  : ca.fourofclubs.utils.math.Nat = 0+1+1+1
+  Zero * two                                      //> res1: ca.fourofclubs.utils.math.Nat = 0
+  two * two + one                                 //> res2: ca.fourofclubs.utils.math.Nat = 0+1+1+1+1+1
+  two == one                                      //> res3: Boolean = false
+  one == one                                      //> res4: Boolean = true
+  one == Zero.successor                           //> res5: Boolean = true
+  one < Zero                                      //> res6: Boolean = false
+  one > Zero                                      //> res7: Boolean = true
+  two >= two                                      //> res8: Boolean = true
+  one <= two                                      //> res9: Boolean = true
 }

@@ -49,6 +49,7 @@ object Complex {
   val ONE = new Complex(1, 0)
   val ZERO = new Complex(0, 0)
   val i = new Complex(0, 1)
+  def apply(a: BigDecimal, b: BigDecimal) = new Complex(a, b)
   implicit def bigDecimal2Complex(x: BigDecimal) = new Complex(x, 0)
   implicit def double2Complex(x: Double) = new Complex(BigDecimal.apply(x), 0)
 }
