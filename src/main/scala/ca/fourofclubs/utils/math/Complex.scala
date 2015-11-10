@@ -1,10 +1,15 @@
 package ca.fourofclubs.utils.math
-import java.lang.Math._
+
+import java.lang.Math.sqrt
+
+import scala.BigDecimal
+import scala.language.implicitConversions
+import scala.math.BigDecimal.int2bigDecimal
 
 /** A complex number
- *  @param a The real part.
- *  @param b The imaginary part.
- */
+  * @param a The real part.
+  * @param b The imaginary part.
+  */
 final class Complex(a: BigDecimal, b: BigDecimal) {
   /** Gets the real part of the complex value */
   def re = a
