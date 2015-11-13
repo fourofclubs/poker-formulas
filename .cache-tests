@@ -4,22 +4,22 @@ output mode:
 0 -> multiple
 output directories:
 1 items
-/Users/Brad Micholson/git/scala-playground/src/test/scala -> /Users/Brad Micholson/git/scala-playground/target/test-classes
+C:\Users\Developer\git\scala-playground\src\test\scala -> C:\Users\Developer\git\scala-playground\target\test-classes
 compile options:
 8 items
 0 -> -javabootclasspath
-1 -> /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/ui.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/jsse.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/jce.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/charsets.jar:/System/Library/Java/Extensions/AppleScriptEngine.jar:/System/Library/Java/Extensions/dns_sd.jar:/System/Library/Java/Extensions/j3daudio.jar:/System/Library/Java/Extensions/j3dcore.jar:/System/Library/Java/Extensions/j3dutils.jar:/System/Library/Java/Extensions/jai_codec.jar:/System/Library/Java/Extensions/jai_core.jar:/System/Library/Java/Extensions/mlibwrapper_jai.jar:/System/Library/Java/Extensions/MRJToolkit.jar:/System/Library/Java/Extensions/QTJava.zip:/System/Library/Java/Extensions/vecmath.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/ext/apple_provider.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/ext/dnsns.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/ext/localedata.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/ext/sunjce_provider.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/ext/sunpkcs11.jar
+1 -> C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\vm.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\annotation.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\beans.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\java.util.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\jndi.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\logging.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\security.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\sql.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ibmorb.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ibmorbapi.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ibmcfw.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\rt.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\charsets.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\resources.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ibmpkcs.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ibmcertpathfw.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ibmjgssfw.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ibmjssefw.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ibmsaslfw.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ibmjcefw.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ibmjgssprovider.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ibmjsseprovider2.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ibmcertpathprovider.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ibmxmlcrypto.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\management-agent.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\xml.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\jlm.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\javascript.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\CmpCrmf.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\dnsns.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\dtfj-interface.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\dtfj.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\dtfjview.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\gskikm.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\healthcenter.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\ibmcmsprovider.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\ibmjcefips.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\ibmjceprovider.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\ibmkeycert.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\IBMKeyManagementServer.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\ibmpkcs11impl.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\ibmsaslprovider.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\IBMSecureRandom.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\ibmxmlencprovider.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\jaccess.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\JavaDiagnosticsCollector.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\JawBridge.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\jdmpview.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\localedata.jar;C:\Program Files (x86)\IBM\SDP\jdk\jre\lib\ext\xmlencfw.jar
 2 -> -javaextdirs
 3 ->  
 4 -> -bootclasspath
-5 -> /Applications/eclipse-scala/plugins/org.scala-lang.scala-library_2.11.7.v20150622-112736-1fbce4612c.jar
+5 -> C:\scala\eclipse\plugins\org.scala-lang.scala-library_2.11.6.v20150224-172222-092690e7bf.jar
 6 -> -encoding
 7 -> UTF-8
 javac options:
 0 items
 compiler version:
 1 items
-0 -> 2.11.7
+0 -> 2.11.6
 compile order:
 1 items
 0 -> Mixed
@@ -54,21 +54,22 @@ product stamps:
 0 items
 source stamps:
 1 items
-/Users/Brad Micholson/git/scala-playground/src/test/scala/ca/fourofclubs/utils/ComplexTest.scala -> hash(da39a3ee5e6b4b0d3255bfef95601890afd80709)
+C:\Users\Developer\git\scala-playground\src\test\scala\ca\fourofclubs\utils\ComplexTest.scala -> hash(da39a3ee5e6b4b0d3255bfef95601890afd80709)
 binary stamps:
 0 items
 class names:
 0 items
 internal apis:
 1 items
-/Users/Brad Micholson/git/scala-playground/src/test/scala/ca/fourofclubs/utils/ComplexTest.scala -> 
-rO0ABXNyABB4c2J0aS5hcGkuU291cmNlFlpwRASfbtoCAAZJAAdhcGlIYXNoWgAIaGFzTWFjcm9MABhfaW50ZXJuYWxPbmx5X25hbWVIYXNoZXN0ACRMeHNidGkvYXBpL19pbnRlcm5hbE9ubHlfTmFtZUhhc2hlcztMAANhcGl0ABVMeHNidGkvYXBpL1NvdXJjZUFQSTtMAAtjb21waWxhdGlvbnQAF0x4c2J0aS9hcGkvQ29tcGlsYXRpb247WwAEaGFzaHQAAltCeHC4IVHqAHNyACJ4c2J0aS5hcGkuX2ludGVybmFsT25seV9OYW1lSGFzaGVzVNq+mfrU7EwCAAJbAA9pbXBsaWNpdE1lbWJlcnN0ACNbTHhzYnRpL2FwaS9faW50ZXJuYWxPbmx5X05hbWVIYXNoO1sADnJlZ3VsYXJNZW1iZXJzcQB+AAd4cHVyACNbTHhzYnRpLmFwaS5faW50ZXJuYWxPbmx5X05hbWVIYXNoO0lagLbdlov0AgAAeHAAAAAAdXEAfgAJAAAAAHNyABN4c2J0aS5hcGkuU291cmNlQVBJuV6n+SkjOKQCAAJbAAtkZWZpbml0aW9uc3QAF1tMeHNidGkvYXBpL0RlZmluaXRpb247WwAIcGFja2FnZXN0ABRbTHhzYnRpL2FwaS9QYWNrYWdlO3hwdXIAF1tMeHNidGkuYXBpLkRlZmluaXRpb247iMlc57TjXg4CAAB4cAAAAAB1cgAUW0x4c2J0aS5hcGkuUGFja2FnZTtbExk3cKcnoQIAAHhwAAAAAHNyABV4c2J0aS5hcGkuQ29tcGlsYXRpb27t+uDDauigQgIAAkoACXN0YXJ0VGltZVsAB291dHB1dHN0ABpbTHhzYnRpL2FwaS9PdXRwdXRTZXR0aW5nO3hwAAABULx9doR1cgAaW0x4c2J0aS5hcGkuT3V0cHV0U2V0dGluZzt/asLzp4elQgIAAHhwAAAAAXNyABd4c2J0aS5hcGkuT3V0cHV0U2V0dGluZ3rZmkd0+x17AgACTAAPb3V0cHV0RGlyZWN0b3J5dAASTGphdmEvbGFuZy9TdHJpbmc7TAAPc291cmNlRGlyZWN0b3J5cQB+ABp4cHQAPi9Vc2Vycy9CcmFkIE1pY2hvbHNvbi9naXQvc2NhbGEtcGxheWdyb3VuZC90YXJnZXQvdGVzdC1jbGFzc2VzdAA5L1VzZXJzL0JyYWQgTWljaG9sc29uL2dpdC9zY2FsYS1wbGF5Z3JvdW5kL3NyYy90ZXN0L3NjYWxhdXIAAltCrPMX+AYIVOACAAB4cAAAABTaOaPuXmtLDTJVv++VYBiQr9gHCQ==
+C:\Users\Developer\git\scala-playground\src\test\scala\ca\fourofclubs\utils\ComplexTest.scala -> 
+rO0ABXNyABB4c2J0aS5hcGkuU291cmNlFlpwRASfbtoCAAZJAAdhcGlIYXNoWgAIaGFzTWFjcm9MABhfaW50ZXJuYWxPbmx5X25hbWVIYXNoZXN0ACRMeHNidGkvYXBpL19pbnRlcm5hbE9ubHlfTmFtZUhhc2hlcztMAANhcGl0ABVMeHNidGkvYXBpL1NvdXJjZUFQSTtMAAtjb21waWxhdGlvbnQAF0x4c2J0aS9hcGkvQ29tcGlsYXRpb247WwAEaGFzaHQAAltCeHC4IVHqAHNyACJ4c2J0aS5hcGkuX2ludGVybmFsT25seV9OYW1lSGFzaGVzVNq+mfrU7EwCAAJbAA9pbXBsaWNpdE1lbWJlcnN0ACNbTHhzYnRpL2FwaS9faW50ZXJuYWxPbmx5X05hbWVIYXNoO1sADnJlZ3VsYXJNZW1iZXJzcQB+AAd4cHVyACNbTHhzYnRpLmFwaS5faW50ZXJuYWxPbmx5X05hbWVIYXNoO0lagLbdlov0AgAAeHAAAAAAdXEAfgAJAAAAAHNyABN4c2J0aS5hcGkuU291cmNlQVBJuV6n+SkjOKQCAAJbAAtkZWZpbml0aW9uc3QAF1tMeHNidGkvYXBpL0RlZmluaXRpb247WwAIcGFja2FnZXN0ABRbTHhzYnRpL2FwaS9QYWNrYWdlO3hwdXIAF1tMeHNidGkuYXBpLkRlZmluaXRpb247iMlc57TjXg4CAAB4cAAAAAB1cgAUW0x4c2J0aS5hcGkuUGFja2FnZTtbExk3cKcnoQIAAHhwAAAAAHNyABV4c2J0aS5hcGkuQ29tcGlsYXRpb27t+uDDauigQgIAAkoACXN0YXJ0VGltZVsAB291dHB1dHN0ABpbTHhzYnRpL2FwaS9PdXRwdXRTZXR0aW5nO3hwAAABUPx/48V1cgAaW0x4c2J0aS5hcGkuT3V0cHV0U2V0dGluZzt/asLzp4elQgIAAHhwAAAAAXNyABd4c2J0aS5hcGkuT3V0cHV0U2V0dGluZ3rZmkd0+x17AgACTAAPb3V0cHV0RGlyZWN0b3J5dAASTGphdmEvbGFuZy9TdHJpbmc7TAAPc291cmNlRGlyZWN0b3J5cQB+ABp4cHQAO0M6XFVzZXJzXERldmVsb3BlclxnaXRcc2NhbGEtcGxheWdyb3VuZFx0YXJnZXRcdGVzdC1jbGFzc2VzdAA2QzpcVXNlcnNcRGV2ZWxvcGVyXGdpdFxzY2FsYS1wbGF5Z3JvdW5kXHNyY1x0ZXN0XHNjYWxhdXIAAltCrPMX+AYIVOACAAB4cAAAABTaOaPuXmtLDTJVv++VYBiQr9gHCQ==
 external apis:
 0 items
 source infos:
 1 items
-/Users/Brad Micholson/git/scala-playground/src/test/scala/ca/fourofclubs/utils/ComplexTest.scala -> 
+C:\Users\Developer\git\scala-playground\src\test\scala\ca\fourofclubs\utils\ComplexTest.scala -> 
 AAAAAAAAAAA=
 compilations:
-1 items
+2 items
 0 -> rO0ABXNyABV4c2J0aS5hcGkuQ29tcGlsYXRpb27t+uDDauigQgIAAkoACXN0YXJ0VGltZVsAB291dHB1dHN0ABpbTHhzYnRpL2FwaS9PdXRwdXRTZXR0aW5nO3hwAAABULx9doR1cgAaW0x4c2J0aS5hcGkuT3V0cHV0U2V0dGluZzt/asLzp4elQgIAAHhwAAAAAXNyABd4c2J0aS5hcGkuT3V0cHV0U2V0dGluZ3rZmkd0+x17AgACTAAPb3V0cHV0RGlyZWN0b3J5dAASTGphdmEvbGFuZy9TdHJpbmc7TAAPc291cmNlRGlyZWN0b3J5cQB+AAZ4cHQAPi9Vc2Vycy9CcmFkIE1pY2hvbHNvbi9naXQvc2NhbGEtcGxheWdyb3VuZC90YXJnZXQvdGVzdC1jbGFzc2VzdAA5L1VzZXJzL0JyYWQgTWljaG9sc29uL2dpdC9zY2FsYS1wbGF5Z3JvdW5kL3NyYy90ZXN0L3NjYWxh
+1 -> rO0ABXNyABV4c2J0aS5hcGkuQ29tcGlsYXRpb27t+uDDauigQgIAAkoACXN0YXJ0VGltZVsAB291dHB1dHN0ABpbTHhzYnRpL2FwaS9PdXRwdXRTZXR0aW5nO3hwAAABUPx/48V1cgAaW0x4c2J0aS5hcGkuT3V0cHV0U2V0dGluZzt/asLzp4elQgIAAHhwAAAAAXNyABd4c2J0aS5hcGkuT3V0cHV0U2V0dGluZ3rZmkd0+x17AgACTAAPb3V0cHV0RGlyZWN0b3J5dAASTGphdmEvbGFuZy9TdHJpbmc7TAAPc291cmNlRGlyZWN0b3J5cQB+AAZ4cHQAO0M6XFVzZXJzXERldmVsb3BlclxnaXRcc2NhbGEtcGxheWdyb3VuZFx0YXJnZXRcdGVzdC1jbGFzc2VzdAA2QzpcVXNlcnNcRGV2ZWxvcGVyXGdpdFxzY2FsYS1wbGF5Z3JvdW5kXHNyY1x0ZXN0XHNjYWxh
