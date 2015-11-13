@@ -1,5 +1,8 @@
 package ca.fourofclubs.utils.math
-import Math._
+
+import scala.language.{ implicitConversions, postfixOps }
+
+import Math.gcd
 
 class Rational(a: Int, b: Int) {
   private val v: (Int, Int) = {

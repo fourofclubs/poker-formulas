@@ -1,6 +1,8 @@
 package ca.fourofclubs.utils.math
 
-import Nat._
+import scala.language.{ implicitConversions, postfixOps }
+
+import Nat.{ Eight, Two }
 
 abstract class Nat {
   def isZero: Boolean
