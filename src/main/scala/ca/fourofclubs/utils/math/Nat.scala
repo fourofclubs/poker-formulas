@@ -66,6 +66,10 @@ object Nat {
     case List()  ⇒ Zero
     case cs :+ c ⇒ (Nat(cs mkString, base) * base) + indexOf(c, digits)
   }
-  def apply(str: String): Nat = Nat(str, Ten)
+  def apply(str: String): Nat = str.toList match {
+    case 'b' :: cs ⇒ Nat(cs mkString, Two)
+    case 'h' :: cs ⇒ Nat(cs mkString, Eight * Two)
+    case _         ⇒ Nat(str, Ten)
+  }
   implicit def string2Nat(str: String) = Nat(str)
 }

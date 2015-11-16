@@ -1,15 +1,20 @@
 package ca.fourofclubs.utils.math
-import Complex._
-import Math._
-import Rational._
 import Nat._
 
 object scratch {
-  val e1 = Prod(Sum(Val(1), Sum(Var("x"), Val(8))), Sum(Var("y"), Val(5)))
-                                                  //> e1  : ca.fourofclubs.utils.math.Prod = (1+x+8)*(y+5)
-  e1.eval("x" -> 3, "y" -> 2)                     //> res0: Double = 84.0
+  Nat("10") * "11"                                //> res0: ca.fourofclubs.utils.math.Nat = 110
 
-  Nat("10") * "11"                                //> res1: ca.fourofclubs.utils.math.Nat = 110
-
-  "199".successor                                 //> res2: ca.fourofclubs.utils.math.Nat = 200
+  string2Nat("hA")                                //> res1: ca.fourofclubs.utils.math.Nat = 10
+  Spring + 5                                      //> res2: <error> = Summer
 }
+
+sealed trait Season {
+  def +(n: Int): Season = if (n > 0) next + (n - 1) else if (n < 0) previous + (n + 1) else this
+  def -(n: Int) = this + (-n)
+  def next: Season
+  def previous: Season
+}
+case object Spring extends Season { def next = Summer; def previous = Winter }
+case object Summer extends Season { def next = Autumn; def previous = Spring }
+case object Autumn extends Season { def next = Winter; def previous = Summer }
+case object Winter extends Season { def next = Spring; def previous = Autumn }
