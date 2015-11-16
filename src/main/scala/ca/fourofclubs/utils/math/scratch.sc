@@ -5,7 +5,7 @@ object scratch {
   Nat("10") * "11"                                //> res0: ca.fourofclubs.utils.math.Nat = 110
 
   string2Nat("hA")                                //> res1: ca.fourofclubs.utils.math.Nat = 10
-  Spring + 5                                      //> res2: <error> = Summer
+  Spring - 120                                    //> res2: <error> = Spring
 }
 
 sealed trait Season {

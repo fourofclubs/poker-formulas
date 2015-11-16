@@ -4,8 +4,8 @@ import Nat._
 object scratch {;import org.scalaide.worksheet.runtime.library.WorksheetSupport._; def main(args: Array[String])=$execute{;$skip(84); val res$0 = 
   Nat("10") * "11";System.out.println("""res0: ca.fourofclubs.utils.math.Nat = """ + $show(res$0));$skip(21); val res$1 = 
 
-  string2Nat("hA");System.out.println("""res1: ca.fourofclubs.utils.math.Nat = """ + $show(res$1));$skip(13); val res$2 = 
-  Spring + 5;System.out.println("""res2: <error> = """ + $show(res$2))}
+  string2Nat("hA");System.out.println("""res1: ca.fourofclubs.utils.math.Nat = """ + $show(res$1));$skip(15); val res$2 = 
+  Spring - 120;System.out.println("""res2: <error> = """ + $show(res$2))}
 }
 
 sealed trait Season {
