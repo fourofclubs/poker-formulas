@@ -19,7 +19,6 @@ abstract class Nat {
     if (that.isZero) throw new IllegalArgumentException("Cannot divide by zero.")
     else if (this < that) (Zero, this)
     else ((this - that) / that) match { case (q, r) ⇒ (q.successor, r) }
-  def ==(that: Nat): Boolean
   def toStringInBase(base: Nat) = Nat.toBase(this, base)
   def toBinaryString = toStringInBase(Two)
   def toOctalString = toStringInBase(Eight)
@@ -30,7 +29,7 @@ object Zero extends Nat {
   override def toString = Nat.digit(Zero).toString
   def isZero = true
   def precessor = throw new IllegalStateException("Negative natural number.")
-  def ==(that: Nat) = that.isZero
+  override def equals(that: Any) = that.isInstanceOf[Nat] && that.asInstanceOf[Nat].isZero
   def <(that: Nat) = !that.isZero
 }
 
@@ -38,7 +37,8 @@ class Successor(n: Nat) extends Nat {
   override def toString = this.toStringInBase(Nat.Ten)
   def isZero = false
   def precessor = n
-  def ==(that: Nat) = !that.isZero && this.precessor == that.precessor
+  override def equals(that: Any) = that.isInstanceOf[Nat] && !that.asInstanceOf[Nat].isZero &&
+    this.precessor == that.asInstanceOf[Nat].precessor
   def <(that: Nat) = !that.isZero && this.precessor < that.precessor
 }
 

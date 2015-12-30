@@ -1,8 +1,7 @@
 package ca.fourofclubs.utils.math
 
-object poolCues {
-  val nums = List(1, 2, 3, 6, 7, 8, 9, 10, 11, 13, 14, 15)
-                                                  //> nums  : List[Int] = List(1, 2, 3, 6, 7, 8, 9, 10, 11, 13, 14, 15)
+object poolCues {;import org.scalaide.worksheet.runtime.library.WorksheetSupport._; def main(args: Array[String])=$execute{;$skip(112); 
+  val nums = List(1, 2, 3, 6, 7, 8, 9, 10, 11, 13, 14, 15);System.out.println("""nums  : List[Int] = """ + $show(nums ));$skip(292); 
   nums.permutations.filter {
     _ match {
       case List(a, b, c, d, e, f, g, h, i, j, k, l) ⇒ {
@@ -15,5 +14,5 @@ object poolCues {
         h + i == l
       }
     }
-  }.foreach { println(_) }                        //> List(7, 2, 11, 9, 3, 10, 1, 8, 6, 15, 13, 14)/
+  }.foreach { println(_) }}
 }
