@@ -17,7 +17,7 @@ object Integer {
     case _         ⇒ new Integer(Nat(str, base), true)
   }
   def apply(str: String): Integer = str.toList match {
-    case '-' :: cs ⇒ -apply(cs mkString)
+    case '-' :: cs ⇒ -Integer(cs mkString)
     case 'b' :: cs ⇒ Integer(cs mkString, Two)
     case 'h' :: cs ⇒ Integer(cs mkString, Eight * Two)
     case _         ⇒ Integer(str, Ten)
