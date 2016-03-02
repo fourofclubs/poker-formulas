@@ -41,12 +41,11 @@ object Streams {
     }
     def empty[A]: Stream[A] = Empty
     def apply[A](as: A*): Stream[A] = if (as.isEmpty) empty else cons(as.head, apply(as.tail: _*))
-    def constant[A](a: A): Stream[A] = cons(a, constant(a))
-    def from(n: Int): Stream[Int] = cons(n, from(n + 1))
-    def fibs: Stream[Int] = {
-    	def fibsFrom(a:Int, b:Int):Stream[Int] = cons(a, fibsFrom(b, a + b))
-    	fibsFrom(0, 1)
-    }
+    def constant[A](a: A): Stream[A] = unfold(a)(a => Some(a, a))
+    def from(n: Int): Stream[Int] = unfold(n)(a => Some(a, a + 1))
+    def fibs: Stream[Int] = unfold((0, 1)) { case (a, b) => Some(a, (b, a + b)) }
+    def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] =
+      f(z).map { case (a, s) => cons(a, unfold(s)(f)) }.getOrElse(empty[A])
   }
 
   val str = Stream(1, 2, 3)                       //> str  : ca.fourofclubs.playground.Streams.Stream[Int] = Cons(<function0>,<fu
