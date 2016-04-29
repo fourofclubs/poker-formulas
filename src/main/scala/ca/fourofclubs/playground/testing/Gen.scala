@@ -11,9 +11,11 @@ import java.util.concurrent.Executors
 
 case class Gen[+A](sample: State[RNG, A]) {
   def map[B](f: A => B): Gen[B] = Gen(sample.map { f })
+  def map2[B, C](g: Gen[B])(f: (A, B) => C): Gen[C] = Gen(State.map2(sample, g.sample)(f))
   def flatMap[B](f: A => Gen[B]): Gen[B] = Gen(sample.flatMap { a => f(a).sample })
   def listOfN(size: Gen[Int]): Gen[List[A]] = size.flatMap(n => Gen.listOf(n, this))
   def unsized = SGen(_ => this)
+  def **[B](g: Gen[B]): Gen[(A, B)] = (this map2 g)((_, _))
 }
 
 case class SGen[+A](forSize: Int => Gen[A]) {
@@ -32,6 +34,7 @@ object Gen {
   def union[A](g1: Gen[A], g2: Gen[A]): Gen[A] = boolean.flatMap { if (_) g1 else g2 }
   def weighted[A](g1: (Gen[A], Double), g2: (Gen[A], Double)): Gen[A] =
     Gen(Rand.double).flatMap { x => if (x * (g1._2.abs + g2._2.abs) < g1._2.abs) g1._1 else g2._1 }
+  def intFn[A](g: Gen[Int]): Gen[A => Int] = g map (i => (a => a.hashCode >> i))
 }
 
 case class Prop(run: (MaxSize, TestCases, RNG) => Result) {
@@ -100,7 +103,7 @@ object Prop {
   }
   private val S = Gen.weighted(Gen.choose(1, 4).map(Executors.newFixedThreadPool(_)) -> .75,
     Gen.unit(Executors.newCachedThreadPool) -> .25)
-  def forAllPar[A](g: Gen[A])(f: A => Par[Boolean]): Prop = forAll(S.map2 { x => ??? })
+  def forAllPar[A](g: Gen[A])(f: A => Par[Boolean]): Prop = forAll(S ** g) { case s ** a => f(a)(s).get }
   def check(p: => Boolean) = Prop { (_, _, _) =>
     if (p) Proved else Falsified("()", 0)
   }
@@ -111,4 +114,8 @@ object Prop {
       case Passed            => println(s"+ OK, passed $testCases tests.")
       case Proved            => println(s" + OK, proved property")
     }
+}
+
+object ** {
+  def unapply[A, B](p: (A, B)) = Some(p)
 }
