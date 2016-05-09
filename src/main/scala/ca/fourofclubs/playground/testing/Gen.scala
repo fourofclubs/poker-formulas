@@ -22,6 +22,7 @@ case class SGen[+A](forSize: Int => Gen[A]) {
   def map[B](f: A => B): SGen[B] = SGen(forSize(_).map(f))
   def flatMap[B](f: A => Gen[B]): SGen[B] = SGen(forSize(_).flatMap(f))
   def apply(size: Int) = forSize(size)
+  def **[B](s2: SGen[B]): SGen[(A, B)] = SGen(n => apply(n) ** s2(n))
 }
 
 object Gen {
@@ -35,6 +36,8 @@ object Gen {
   def weighted[A](g1: (Gen[A], Double), g2: (Gen[A], Double)): Gen[A] =
     Gen(Rand.double).flatMap { x => if (x * (g1._2.abs + g2._2.abs) < g1._2.abs) g1._1 else g2._1 }
   def intFn[A](g: Gen[Int]): Gen[A => Int] = g map (i => (a => a.hashCode >> i))
+  def stringN(n: Int): Gen[String] = listOf(n, choose(0, 127)).map(_.map(_.toChar).mkString)
+  val string: SGen[String] = SGen(stringN)
 }
 
 case class Prop(run: (MaxSize, TestCases, RNG) => Result) {
