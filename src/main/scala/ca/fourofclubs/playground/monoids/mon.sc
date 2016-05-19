@@ -24,12 +24,16 @@ object mon {
   Monoids.monoidLaws(Monoids.optionMonoid[Int], intOptionGen).run(1000, 1000, rng)
                                                   //> res4: ca.fourofclubs.playground.testing.Result = Passed
 
-  Monoids.foldMapV(IndexedSeq(1, 2, 3, 4, 5, 6), Monoids.intAddition)(a => a)
+ Monoids.foldMapV(IndexedSeq(1, 2, 3, 4, 5, 6), Monoids.intAddition)(a => a)
                                                   //> res5: Int = 21
   val es = Executors.newCachedThreadPool()        //> es  : java.util.concurrent.ExecutorService = java.util.concurrent.ThreadPool
-                                                  //| Executor@19c019c0
+                                                  //| Executor@7110711
   Monoids.parFoldMap(IndexedSeq(1, 2, 3, 4, 5, 6), Monoids.intMultiplication)(a => a)(es)
                                                   //> res6: java.util.concurrent.Future[Int] = UnitFuture(720)
+	Monoids.wordCount("lorem ipsum dolor sit amet")
+                                                  //> res7: Int = 5
+	Monoids.bag(IndexedSeq(0, 0, 1, 0, 10))   //> res8: Map[Int,Int] = Map(0 -> 3, 1 -> 1, 10 -> 1)
+                                                  
   es.shutdown
-  es.awaitTermination(10, TimeUnit.SECONDS)       //> res7: Boolean = true
+  es.awaitTermination(10, TimeUnit.SECONDS)       //> res9: Boolean = true
 }

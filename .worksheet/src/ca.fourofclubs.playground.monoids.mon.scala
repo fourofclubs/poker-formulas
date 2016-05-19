@@ -14,11 +14,14 @@ object mon {;import org.scalaide.worksheet.runtime.library.WorksheetSupport._; d
   Monoids.monoidLaws(Monoids.booleanAnd, Gen.boolean).run(1000, 1000, rng);System.out.println("""res3: ca.fourofclubs.playground.testing.Result = """ + $show(res$3));$skip(90); 
 
   val intOptionGen = Gen.weighted(Gen.unit(None) -> 0.1, intGen.map { Some(_) } -> 0.9);System.out.println("""intOptionGen  : ca.fourofclubs.playground.testing.Gen[Option[Int]] = """ + $show(intOptionGen ));$skip(83); val res$4 = 
-  Monoids.monoidLaws(Monoids.optionMonoid[Int], intOptionGen).run(1000, 1000, rng);System.out.println("""res4: ca.fourofclubs.playground.testing.Result = """ + $show(res$4));$skip(80); val res$5 = 
+  Monoids.monoidLaws(Monoids.optionMonoid[Int], intOptionGen).run(1000, 1000, rng);System.out.println("""res4: ca.fourofclubs.playground.testing.Result = """ + $show(res$4));$skip(79); val res$5 = 
 
-  Monoids.foldMapV(IndexedSeq(1, 2, 3, 4, 5, 6), Monoids.intAddition)(a => a);System.out.println("""res5: Int = """ + $show(res$5));$skip(43); 
+ Monoids.foldMapV(IndexedSeq(1, 2, 3, 4, 5, 6), Monoids.intAddition)(a => a);System.out.println("""res5: Int = """ + $show(res$5));$skip(43); 
   val es = Executors.newCachedThreadPool();System.out.println("""es  : java.util.concurrent.ExecutorService = """ + $show(es ));$skip(90); val res$6 = 
-  Monoids.parFoldMap(IndexedSeq(1, 2, 3, 4, 5, 6), Monoids.intMultiplication)(a => a)(es);System.out.println("""res6: java.util.concurrent.Future[Int] = """ + $show(res$6));$skip(14); 
-  es.shutdown;$skip(44); val res$7 = 
-  es.awaitTermination(10, TimeUnit.SECONDS);System.out.println("""res7: Boolean = """ + $show(res$7))}
+  Monoids.parFoldMap(IndexedSeq(1, 2, 3, 4, 5, 6), Monoids.intMultiplication)(a => a)(es);System.out.println("""res6: java.util.concurrent.Future[Int] = """ + $show(res$6));$skip(49); val res$7 = 
+	Monoids.wordCount("lorem ipsum dolor sit amet");System.out.println("""res7: Int = """ + $show(res$7));$skip(41); val res$8 = 
+	Monoids.bag(IndexedSeq(0, 0, 1, 0, 10));System.out.println("""res8: Map[Int,Int] = """ + $show(res$8));$skip(66); 
+                                                  
+  es.shutdown;$skip(44); val res$9 = 
+  es.awaitTermination(10, TimeUnit.SECONDS);System.out.println("""res9: Boolean = """ + $show(res$9))}
 }
