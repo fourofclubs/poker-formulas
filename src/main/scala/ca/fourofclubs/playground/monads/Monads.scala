@@ -48,6 +48,8 @@ trait Applicative[F[_]] extends Functor[F] {
   def _apply[A, B](fab: F[A => B])(fa: F[A]): F[B] = map2(fab, fa)((f: A => B, a: A) => f(a))
   def traverse[A, B](as: List[A])(f: A => F[B]): F[List[B]] = as.foldRight(unit(List[B]()))((a, fbs) => map2(f(a), fbs)(_ :: _))
   def sequence[A](lfa: List[F[A]]): F[List[A]] = traverse(lfa)(fa => fa)
+  def sequenceMap[K, V](ofa: Map[K, F[V]]): F[Map[K, V]] =
+    ofa.foldRight(unit(Map.empty[K, V])) { case ((k, fv), acc) => map2(acc, fv)((m, v) => m + (k -> v)) }
   def replicateM[A](n: Int, ma: F[A]): F[List[A]] = sequence(List.fill(n)(ma))
   def product[A, B](ma: F[A], mb: F[B]): F[(A, B)] = map2(ma, mb)((_, _))
   def filterM[A](ms: List[A])(f: A => F[Boolean]): F[List[A]] =
@@ -69,6 +71,38 @@ trait Applicative[F[_]] extends Functor[F] {
     }
   }
 }
+
+trait Traverse[F[_]] extends Functor[F] {
+  def traverse[G[_]: Applicative, A, B](fa: F[A])(f: A => G[B]): G[F[B]] = sequence(map(fa)(f))
+  def sequence[G[_]: Applicative, A](fga: F[G[A]]): G[F[A]] = traverse(fga)(ga => ga)
+  def map[A, B](fa: F[A])(f: A => B): F[B] = {
+    type Id[A] = A
+    val idMonad = new Monad[Id] {
+      def unit[A](a: => A) = a
+      override def flatMap[A, B](a: A)(f: A => B): B = f(a)
+    }
+    traverse[Id, A, B](fa)(f)(idMonad)
+  }
+}
+
+object Traverse {
+  def listTraverse: Traverse[List] = new Traverse[List] {
+    override def traverse[M[_], A, B](as: List[A])(f: A => M[B])(implicit M: Applicative[M]): M[List[B]] =
+      as.foldRight(M.unit(List[B]()))((a, fbs) => M.map2(f(a), fbs)(_ :: _))
+  }
+  def optionTraverse: Traverse[Option] = new Traverse[Option] {
+    override def traverse[M[_], A, B](oa: Option[A])(f: A => M[B])(implicit M: Applicative[M]): M[Option[B]] = oa match {
+      case Some(a) => M.map(f(a))(Some(_))
+      case None    => M.unit(None)
+    }
+  }
+  def treeTraverse: Traverse[Tree] = new Traverse[Tree] {
+    override def traverse[M[_], A, B](ta: Tree[A])(f: A => M[B])(implicit M: Applicative[M]): M[Tree[B]] =
+      M.map2(f(ta.head), listTraverse.traverse(ta.tail)(a => traverse(a)(f)))(Tree(_, _))
+  }
+}
+
+case class Tree[+A](head: A, tail: List[Tree[A]])
 
 object Functors {
   def listFunctor = new Functor[List] {
