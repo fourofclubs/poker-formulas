@@ -2,13 +2,13 @@ package ca.fourofclubs.playground.monads
 
 import java.text.{ ParseException, SimpleDateFormat }
 import java.util.Date
-
 import scala.{ Left, Right, Stream, Vector }
-
 import ca.fourofclubs.playground.State
+import ca.fourofclubs.playground.monoids.Monoid
 import ca.fourofclubs.playground.par.Par
 import ca.fourofclubs.playground.parsing.{ Parser, ParsersImpl }
 import ca.fourofclubs.playground.testing.Gen
+import ca.fourofclubs.playground.monoids.Foldable
 
 trait Functor[F[_]] {
   def map[A, B](fa: F[A])(f: A => B): F[B]
@@ -19,26 +19,21 @@ trait Functor[F[_]] {
   }
 }
 
-trait Monad[F[_]] extends Applicative[F] {
-  def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B]
-
-  def apply[A, B](fab: F[A => B])(fa: F[A]): F[B] = flatMap(fab)(f => map(fa)(a => f(a)))
-  def _flatMap[A, B](fa: F[A])(f: A => F[B]): F[B] = compose((_: Unit) => fa, f)(())
-  override def map[A, B](fa: F[A])(f: A => B): F[B] = flatMap(fa)(a => unit(f(a)))
-  def compose[A, B, C](f: A => F[B], g: B => F[C]): A => F[C] = a => flatMap(f(a))(g)
-  def _compose[A, B, C](f: A => F[B], g: B => F[C]): A => F[C] = a => join(map(f(a))(g))
-  def join[A](mma: F[F[A]]): F[A] = flatMap(mma)(ma => ma)
-}
-
-case class Id[A](value: A) {
-  def map[B](f: A => B) = Id(f(value))
-  def flatMap[B](f: A => Id[B]) = f(value)
+object Functor {
+  def listFunctor = new Functor[List] {
+    def map[A, B](as: List[A])(f: A => B) = as map f
+  }
+  def optionFunctor = new Functor[Option] {
+    def map[A, B](oa: Option[A])(f: A => B) = oa map f
+  }
+  def parFunctor = new Functor[Par] {
+    def map[A, B](pa: Par[A])(f: A => B) = Par.map(pa)(f)
+  }
 }
 
 trait Applicative[F[_]] extends Functor[F] {
-  def apply[A, B](fab: F[A => B])(fa: F[A]): F[B]
   def unit[A](a: => A): F[A]
-
+  def apply[A, B](fab: F[A => B])(fa: F[A]): F[B] = map2(fab, fa)(_(_))
   def map[A, B](fa: F[A])(f: A => B): F[B] = apply(unit(f))(fa)
   def map2[A, B, C](fa: F[A], fb: F[B])(f: (A, B) => C): F[C] = apply(map(fa)(f.curried))(fb)
   def map3[A, B, C, D](fa: F[A], fb: F[B], fc: F[C])(f: (A, B, C) => D): F[D] =
@@ -58,7 +53,7 @@ trait Applicative[F[_]] extends Functor[F] {
     val self = this
     new Applicative[({ type f[x] = (F[x], G[x]) })#f] {
       def unit[A](a: ⇒ A): (F[A], G[A]) = (self.unit(a), G.unit(a))
-      def apply[A, B](fab: (F[A ⇒ B], G[A ⇒ B]))(fa: (F[A], G[A])): (F[B], G[B]) =
+      override def apply[A, B](fab: (F[A ⇒ B], G[A ⇒ B]))(fa: (F[A], G[A])): (F[B], G[B]) =
         (self.apply(fab._1)(fa._1), G.apply(fab._2)(fa._2))
     }
   }
@@ -66,13 +61,37 @@ trait Applicative[F[_]] extends Functor[F] {
     val self = this
     new Applicative[({ type f[x] = F[G[x]] })#f] {
       def unit[A](a: ⇒ A): F[G[A]] = self.unit(G.unit(a))
-      def apply[A, B](fab: F[G[A ⇒ B]])(fa: F[G[A]]): F[G[B]] =
+      override def apply[A, B](fab: F[G[A ⇒ B]])(fa: F[G[A]]): F[G[B]] =
         self.map2(fab, fa)(G.apply(_)(_))
     }
   }
 }
 
-trait Traverse[F[_]] extends Functor[F] {
+object Applicative {
+  def listApplicative = new Applicative[List] {
+    def unit[A](a: ⇒ A): List[A] = List(a)
+    override def apply[A, B](fs: List[A ⇒ B])(as: List[A]): List[B] = for (f <- fs; a <- as) yield f(a)
+  }
+  def optionApplicative = new Applicative[Option] {
+    def unit[A](a: => A): Option[A] = Some(a)
+    override def apply[A, B](of: Option[A => B])(oa: Option[A]): Option[B] = for (f <- of; a <- oa) yield f(a)
+  }
+  def parApplicative = new Applicative[Par] {
+    def unit[A](a: => A): Par[A] = Par.unit(a)
+    override def apply[A, B](pf: Par[A => B])(pa: Par[A]): Par[B] = Par.map2(pf, pa)((f, a) => f(a))
+  }
+  def validationApplicative[E] = new Applicative[({ type f[x] = Validation[E, x] })#f] {
+    def unit[A](a: => A): Validation[E, A] = Success(a)
+    override def apply[A, B](fab: Validation[E, A => B])(fa: Validation[E, A]): Validation[E, B] = (fab, fa) match {
+      case (Failure(h, t), Failure(h2, t2)) => Failure(h, h2 +: t ++: t2)
+      case (e @ Failure(_, _), Success(_))  => e
+      case (Success(_), e @ Failure(_, _))  => e
+      case (Success(f), Success(a))         => Success(f(a))
+    }
+  }
+}
+
+trait Traverse[F[_]] extends Functor[F] with Foldable[F] {
   def traverse[G[_]: Applicative, A, B](fa: F[A])(f: A => G[B]): G[F[B]] = sequence(map(fa)(f))
   def sequence[G[_]: Applicative, A](fga: F[G[A]]): G[F[A]] = traverse(fga)(ga => ga)
   def map[A, B](fa: F[A])(f: A => B): F[B] = {
@@ -86,6 +105,11 @@ trait Traverse[F[_]] extends Functor[F] {
 }
 
 object Traverse {
+  type Const[M, B] = M
+  implicit def monoidApplicative[M](M: Monoid[M]) = new Applicative[({ type f[x] = Const[M, x] })#f] {
+    def unit[A](a: => A): M = M.zero
+    override def map2[A, B, C](m1: M, m2: M)(f: (A, B) => C): M = M.op(m1, m2)
+  }
   def listTraverse: Traverse[List] = new Traverse[List] {
     override def traverse[M[_], A, B](as: List[A])(f: A => M[B])(implicit M: Applicative[M]): M[List[B]] =
       as.foldRight(M.unit(List[B]()))((a, fbs) => M.map2(f(a), fbs)(_ :: _))
@@ -104,13 +128,23 @@ object Traverse {
 
 case class Tree[+A](head: A, tail: List[Tree[A]])
 
-object Functors {
-  def listFunctor = new Functor[List] {
-    def map[A, B](as: List[A])(f: A => B) = as map f
-  }
+trait Monad[F[_]] extends Applicative[F] {
+  def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B]
+
+  override def apply[A, B](fab: F[A => B])(fa: F[A]): F[B] = flatMap(fab)(f => map(fa)(a => f(a)))
+  def _flatMap[A, B](fa: F[A])(f: A => F[B]): F[B] = compose((_: Unit) => fa, f)(())
+  override def map[A, B](fa: F[A])(f: A => B): F[B] = flatMap(fa)(a => unit(f(a)))
+  def compose[A, B, C](f: A => F[B], g: B => F[C]): A => F[C] = a => flatMap(f(a))(g)
+  def _compose[A, B, C](f: A => F[B], g: B => F[C]): A => F[C] = a => join(map(f(a))(g))
+  def join[A](mma: F[F[A]]): F[A] = flatMap(mma)(ma => ma)
 }
 
-object Monads {
+case class Id[A](value: A) {
+  def map[B](f: A => B) = Id(f(value))
+  def flatMap[B](f: A => Id[B]) = f(value)
+}
+
+object Monad {
   val parMonad: Monad[Par] = new Monad[Par] {
     def unit[A](a: => A) = Par.unit(a)
     def flatMap[A, B](p: Par[A])(f: A => Par[B]) = Par.flatMap(p)(f)
@@ -147,15 +181,6 @@ object Monads {
     def unit[A](a: ⇒ A): Either[E, A] = Right(a)
     def flatMap[A, B](fa: Either[E, A])(f: A ⇒ Either[E, B]): Either[E, B] = fa.right flatMap f
   }
-  def validationApplicative[E] = new Applicative[({ type f[x] = Validation[E, x] })#f] {
-    def unit[A](a: => A): Validation[E, A] = Success(a)
-    def apply[A, B](fab: Validation[E, A => B])(fa: Validation[E, A]): Validation[E, B] = (fab, fa) match {
-      case (Failure(h, t), Failure(h2, t2)) => Failure(h, h2 +: t ++: t2)
-      case (e @ Failure(_, _), Success(_))  => e
-      case (Success(_), e @ Failure(_, _))  => e
-      case (Success(f), Success(a))         => Success(f(a))
-    }
-  }
 }
 
 sealed trait Validation[+E, +A]
@@ -174,7 +199,7 @@ object Validation {
     if (phoneNumber.matches("[0-9]{10}")) Success(phoneNumber)
     else Failure("Phone number must be 10 digits")
   def validWebForm(name: String, birthdate: String, phone: String): Validation[String, WebForm] =
-    Monads.validationApplicative[String].map3(
+    Applicative.validationApplicative[String].map3(
       validName(name),
       validBirthdate(birthdate),
       validPhone(phone))(WebForm(_, _, _))
