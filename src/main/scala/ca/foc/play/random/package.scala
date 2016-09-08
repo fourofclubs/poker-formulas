@@ -1,5 +1,5 @@
-package ca.fourofclubs.playground
+package ca.foc.play
 
-package ca.foc.play.random random {
+package object random {
   type Rand[+A] = State[RNG, A]
 }

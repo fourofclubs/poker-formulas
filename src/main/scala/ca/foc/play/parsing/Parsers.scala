@@ -2,7 +2,7 @@ package ca.foc.play.parsing
 
 import scala.util.matching.Regex
 
-import ca.fourofclubs.playground.testing._
+import ca.foc.play.testing._
 
 trait Parsers[Parser[+_]] { self =>
   def run[A](p: Parser[A])(input: String): Either[ParseError, A]

@@ -10,7 +10,7 @@ case class UnitFuture[A](get: A) extends Future[A] {
 }
 
 object Par {
-  def unit[A](a: A): Par[A] = (es: ExecutorService) => UnitFuture(a)
+  def unit[A](a: A): Par[A] = (es: ExecutorService) ⇒ UnitFuture(a)
   def fork[A](a: => Par[A]): Par[A] =
     es => es.submit(new Callable[A] {
       def call = a(es).get

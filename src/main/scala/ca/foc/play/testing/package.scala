@@ -1,6 +1,6 @@
-package ca.fourofclubs.playground
+package ca.foc.play
 
-package ca.foc.play.testing testing {
+package object testing {
   type TestCases = Int
   type MaxSize = Int
 }

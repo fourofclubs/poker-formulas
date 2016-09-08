@@ -2,13 +2,13 @@ package ca.foc.play.monads
 
 import java.text.{ ParseException, SimpleDateFormat }
 import java.util.Date
+import ca.foc.play.monoids.Monoid
 import scala.{ Left, Right, Stream, Vector }
-import ca.fourofclubs.playground.State
-import ca.fourofclubs.playground.monoids.Monoid
-import ca.fourofclubs.playground.par.Par
-import ca.fourofclubs.playground.parsing.{ Parser, ParsersImpl }
-import ca.fourofclubs.playground.testing.Gen
-import ca.fourofclubs.playground.monoids.Foldable
+import ca.foc.play.State
+import ca.foc.play.par.Par
+import ca.foc.play.parsing.{ Parser, ParsersImpl }
+import ca.foc.play.testing.Gen
+import ca.foc.play.monoids.Foldable
 
 trait Functor[F[_]] {
   def map[A, B](fa: F[A])(f: A => B): F[B]
@@ -136,8 +136,8 @@ object Traverse {
   def treeTraverse: Traverse[Tree] = new Traverse[Tree] {
     override def traverse[M[_], A, B](ta: Tree[A])(f: A => M[B])(implicit M: Applicative[M]): M[Tree[B]] =
       M.map2(f(ta.head), listTraverse.traverse(ta.tail)(a => traverse(a)(f)))(Tree(_, _))
-    def foldLeft[A, B](as: ca.fourofclubs.playground.monads.Tree[A])(z: B)(f: (B, A) ⇒ B): B = ???
-    def foldRight[A, B](as: ca.fourofclubs.playground.monads.Tree[A])(z: B)(f: (A, B) ⇒ B): B = ???
+    def foldLeft[A, B](as: ca.foc.play.monads.Tree[A])(z: B)(f: (B, A) ⇒ B): B = ???
+    def foldRight[A, B](as: ca.foc.play.monads.Tree[A])(z: B)(f: (A, B) ⇒ B): B = ???
   }
 }
 

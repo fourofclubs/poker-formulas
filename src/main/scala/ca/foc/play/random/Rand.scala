@@ -1,6 +1,6 @@
 package ca.foc.play.random
 
-import ca.fourofclubs.playground.State
+import ca.foc.play.State
 
 trait RNG {
   def nextInt: (Int, RNG)
@@ -15,11 +15,11 @@ case class SimpleRNG(seed: Long) extends RNG {
 }
 object Rand {
   def int: Rand[Int] = State(_.nextInt)
-  def nonNegativeInt: Rand[Int] = int.flatMap(n => {
+  def nonNegativeInt: Rand[Int] = int.flatMap(n ⇒ {
     if (n != Int.MinValue) State.unit(Math.abs(n))
     else nonNegativeInt
   })
-  def nonNegativeLessThan(n: Int): Rand[Int] = nonNegativeInt.flatMap(i => {
+  def nonNegativeLessThan(n: Int): Rand[Int] = nonNegativeInt.flatMap(i ⇒ {
     val mod = i % n
     if (i + (n - 1) - mod >= 0) State.unit(mod)
     else nonNegativeLessThan(n)

@@ -1,6 +1,6 @@
-package ca.fourofclubs.playground
+package ca.foc.play
 
-package ca.foc.play.parsing parsing {
+package object parsing {
   type Parser[+A] = Location => Result[A]
 
   sealed trait Result[+A] {

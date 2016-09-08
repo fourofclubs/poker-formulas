@@ -1,7 +1,7 @@
-package ca.fourofclubs.playground
+package ca.foc.play
 
 import java.util.concurrent.{ ExecutorService, Future }
 
-package ca.foc.play.par par {
+package object par {
   type Par[A] = ExecutorService => Future[A]
 }
