@@ -1,14 +1,15 @@
 package ca.foc.play.monads
 
-import java.text.{ ParseException, SimpleDateFormat }
 import java.util.Date
-import ca.foc.play.monoids.Monoid
+
 import scala.{ Left, Right, Stream, Vector }
+
 import ca.foc.play.State
+import ca.foc.play.monoids.{ Foldable, Monoid }
 import ca.foc.play.par.Par
 import ca.foc.play.parsing.{ Parser, ParsersImpl }
 import ca.foc.play.testing.Gen
-import ca.foc.play.monoids.Foldable
+import java.text.ParseException
 
 trait Functor[F[_]] {
   def map[A, B](fa: F[A])(f: A => B): F[B]
@@ -17,6 +18,12 @@ trait Functor[F[_]] {
     case Left(fa)  => map(fa)(Left(_))
     case Right(fb) => map(fb)(Right(_))
   }
+}
+
+class FunctorOps[F[_], A](fa: F[A], functor: Functor[F]) {
+  def map[B](f: A => B) = functor.map(fa)(f)
+  def distribute[B, C](implicit ev: F[A] <:< F[(B, C)]) = functor.distribute(fa)
+  def codistribute[B, C](implicit ev: F[A] <:< Either[F[B], F[C]]) = functor.codistribute(fa)
 }
 
 object Functor {
@@ -65,6 +72,12 @@ trait Applicative[F[_]] extends Functor[F] {
         self.map2(fab, fa)(G.apply(_)(_))
     }
   }
+}
+
+class ApplicativeOps[F[_], A](fa: F[A], ap: Applicative[F]) extends FunctorOps(fa, ap) {
+  def apply[B](fab: F[A => B]) = ap.apply(fab)(fa)
+  def **[B](fb: F[B]) = ap.product(fa, fb)
+  def *(n: Int) = ap.replicateM(n, fa)
 }
 
 object Applicative {
@@ -152,6 +165,11 @@ trait Monad[F[_]] extends Applicative[F] {
   def compose[A, B, C](f: A => F[B], g: B => F[C]): A => F[C] = a => flatMap(f(a))(g)
   def _compose[A, B, C](f: A => F[B], g: B => F[C]): A => F[C] = a => join(map(f(a))(g))
   def join[A](mma: F[F[A]]): F[A] = flatMap(mma)(ma => ma)
+}
+
+class MonadOps[F[_], A](ma: F[A], m: Monad[F]) extends ApplicativeOps(ma, m) {
+  def flatMap[B](f: A => F[B]) = m.flatMap(ma)(f)
+  def join[B](implicit ev: F[A] <:< F[F[B]]) = m.join(ma)
 }
 
 case class Id[A](value: A) {
