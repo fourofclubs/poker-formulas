@@ -1,11 +1,21 @@
 package ca.foc.io
-import IO._
-import scala.collection.TraversableOnce.MonadOps
 
-object Test {
-  def main(args: Array[String]) = {
-    println("Test complete")
-  }
+import ca.foc.play.monads.MonadOps
+import ca.foc.play.monads.Monad
+import Console._
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.MoreExecutors._
+import java.util.concurrent.TimeUnit._
+
+object Test extends App {
+  val es = Executors.newCachedThreadPool
+  val f = Test2.run(es)
+  Test1.run
+
+  f.get
+  shutdownAndAwaitTermination(es, 15, SECONDS)
 }
 
 object Test1 {
@@ -17,28 +27,33 @@ object Test1 {
   def winnerMsg(p: Option[Player]) = p.map {
     case Player(name, _) => s"$name is the winner!"
   }.getOrElse("It's a draw.")
-  def contest(p1: Player, p2: Player) = PrintLine(winnerMsg(winner(p1, p2)))
+  def contest(p1: Player, p2: Player) = printLn(winnerMsg(winner(p1, p2)))
 
-  def run = {
+  def run = runConsole {
     contest(Player("Brad", 10), Player("Danyelle", 3)) ++
       contest(Player("Danyelle", 5), Player("Brad", 4))
-  }.run
+  }
 }
 
 object Test2 {
   def fahrenheitToCelcius(f: Double) = (f - 32) * 5.0 / 9.0
-  def converter: IO[Unit] = for {
-    _ <- PrintLine("Enter a temperature in Fahrenheit:")
-    d <- ReadLine.map(_.toDouble)
-    - <- PrintLine(fahrenheitToCelcius(d).toString)
+  def converter = for {
+    _ <- printLn("Enter a temperature in Fahrenheit:")
+    d <- readLn.map(_.getOrElse("").toDouble)
+    - <- printLn(fahrenheitToCelcius(d).toString)
   } yield ()
 
-  def run = converter.run
+  def run(es: ExecutorService) = runConsolePar(converter)(es)
 }
 
-object Test3 {
+object Test4 {
   def run = {
-    val lines = echo * 5
-    lines.run
+    import Console.ConsoleIO
+    try {
+      val p = printLn("Still going...").forever
+      runConsole(p)
+    } catch {
+      case e: Error => println("Error")
+    }
   }
 }

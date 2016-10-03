@@ -165,11 +165,16 @@ trait Monad[F[_]] extends Applicative[F] {
   def compose[A, B, C](f: A => F[B], g: B => F[C]): A => F[C] = a => flatMap(f(a))(g)
   def _compose[A, B, C](f: A => F[B], g: B => F[C]): A => F[C] = a => join(map(f(a))(g))
   def join[A](mma: F[F[A]]): F[A] = flatMap(mma)(ma => ma)
+  def forever[A](a: F[A]): F[A] = {
+    lazy val t: F[A] = forever(a)
+    flatMap(a)(_ => t)
+  }
 }
 
 class MonadOps[F[_], A](ma: F[A], m: Monad[F]) extends ApplicativeOps(ma, m) {
   def flatMap[B](f: A => F[B]) = m.flatMap(ma)(f)
   def join[B](implicit ev: F[A] <:< F[F[B]]) = m.join(ma)
+  def forever = m.forever(ma)
 }
 
 case class Id[A](value: A) {
@@ -180,7 +185,7 @@ case class Id[A](value: A) {
 object Monad {
   val parMonad: Monad[Par] = new Monad[Par] {
     def unit[A](a: => A) = Par.unit(a)
-    def flatMap[A, B](p: Par[A])(f: A => Par[B]) = Par.flatMap(p)(f)
+    def flatMap[A, B](p: Par[A])(f: A => Par[B]) = Par.fork(Par.flatMap(p)(f))
   }
   val parserMonad: Monad[Parser] = new Monad[Parser] {
     def unit[A](a: => A) = ParsersImpl.succeed(a)
