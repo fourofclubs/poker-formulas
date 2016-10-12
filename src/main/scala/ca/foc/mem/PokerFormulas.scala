@@ -43,7 +43,7 @@ object PokerFormulas extends App {
     p <- List(isValue(v), isValue(v), isValue(v), !isValue(v), !isValue(v)).permutations.toSet[List[Card => Boolean]]
   ) yield "T" + v -> p
   val straight = for (
-    v <- VALUES.filter(_.intVal >= 5);
+    v <- VALUES.filter(v => !(2 to 4).contains(v.intVal));
     p <- List(isValue(v), isValue(v - 1), isValue(v - 2), isValue(v - 3), isValue(v - 4)).permutations.toSet[List[Card => Boolean]]
   ) yield "S(" + v + ")" -> p
   val flush = for (
