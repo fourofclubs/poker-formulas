@@ -17,6 +17,12 @@ object PokerFormulas extends App {
 
   val any = (c: Card) ⇒ true
   def isValue(v: CardVal) = (c: Card) ⇒ c.value == v
+  def FH(v1: CardVal, v2: CardVal) = List(v1, v1, v1, v2, v2)
+  val fullHouse = for (
+    v1 ← VALUES;
+    v2 ← VALUES.filterNot(_ == v1);
+    p ← FH(v1, v2).permutations.toSet[List[CardVal]]
+  ) yield v1 + "/" + v2 -> p.map(isValue(_))
   def Quad(v: CardVal) = List(Some(v), Some(v), Some(v), Some(v), None)
   val quads = for (
     v ← VALUES;
@@ -35,7 +41,7 @@ object PokerFormulas extends App {
     for (
       cut ← 0 to 51;
       d ← List(MemDeck.cut(cut));
-      s ← straightFlush ++ quads;
+      s ← straightFlush ++ quads ++ fullHouse;
       players ← 3 to 10;
       seconds ← find(d, s._2, players)
     ) yield (s._1, cut, players) -> seconds
