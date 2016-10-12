@@ -15,20 +15,24 @@ package object mem {
   sealed trait CardVal extends Ordered[CardVal] {
     def intVal: Int
     override def compare(that: CardVal) = this.intVal.compare(that.intVal)
+    def prev: CardVal
+    def next: CardVal
+    def -(n: Int): CardVal = if (n < 0) this + (-n) else if (n == 0) this else (prev - (n - 1))
+    def +(n: Int): CardVal = if (n < 0) this - (-n) else if (n == 0) this else (next + (n - 1))
   }
-  object K extends CardVal { override def toString = "K"; val intVal = 13 }
-  object Q extends CardVal { override def toString = "Q"; val intVal = 12 }
-  object J extends CardVal { override def toString = "J"; val intVal = 11 }
-  object v10 extends CardVal { override def toString = "10"; val intVal = 10 }
-  object v9 extends CardVal { override def toString = "9"; val intVal = 9 }
-  object v8 extends CardVal { override def toString = "8"; val intVal = 8 }
-  object v7 extends CardVal { override def toString = "7"; val intVal = 7 }
-  object v6 extends CardVal { override def toString = "6"; val intVal = 6 }
-  object v5 extends CardVal { override def toString = "5"; val intVal = 5 }
-  object v4 extends CardVal { override def toString = "4"; val intVal = 4 }
-  object v3 extends CardVal { override def toString = "3"; val intVal = 3 }
-  object v2 extends CardVal { override def toString = "2"; val intVal = 2 }
-  object A extends CardVal { override def toString = "A"; val intVal = 1 }
+  object K extends CardVal { override def toString = "K"; val intVal = 13; val prev = Q; val next = A }
+  object Q extends CardVal { override def toString = "Q"; val intVal = 12; val prev = J; val next = K }
+  object J extends CardVal { override def toString = "J"; val intVal = 11; val prev = v10; val next = Q }
+  object v10 extends CardVal { override def toString = "10"; val intVal = 10; val prev = v9; val next = J }
+  object v9 extends CardVal { override def toString = "9"; val intVal = 9; val prev = v8; val next = v10 }
+  object v8 extends CardVal { override def toString = "8"; val intVal = 8; val prev = v7; val next = v9 }
+  object v7 extends CardVal { override def toString = "7"; val intVal = 7; val prev = v6; val next = v8 }
+  object v6 extends CardVal { override def toString = "6"; val intVal = 6; val prev = v5; val next = v7 }
+  object v5 extends CardVal { override def toString = "5"; val intVal = 5; val prev = v4; val next = v6 }
+  object v4 extends CardVal { override def toString = "4"; val intVal = 4; val prev = v3; val next = v5 }
+  object v3 extends CardVal { override def toString = "3"; val intVal = 3; val prev = v2; val next = v4 }
+  object v2 extends CardVal { override def toString = "2"; val intVal = 2; val prev = A; val next = v3 }
+  object A extends CardVal { override def toString = "A"; val intVal = 1; val prev = K; val next = v2 }
 
   val SUITS = Set(S, H, C, D)
   val VALUES = Set(A, v2, v3, v4, v5, v6, v7, v8, v9, v10, J, Q, K)
