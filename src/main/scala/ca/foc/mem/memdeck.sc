@@ -12,5 +12,8 @@ object memdeck {
   acaan((8, D), 52)                               //> res3: ca.foc.mem.Card = 8D
   acaan((Q, C), 52)                               //> res4: ca.foc.mem.Card = QC
   acaan((6, H), 52)                               //> res5: ca.foc.mem.Card = 6H
+	
+	PokerFormulas.straightFlush(S, v8)        //> res6: scala.collection.immutable.Set[ca.foc.mem.Card] = Set(8S, 4S, 7S, 6S, 
+                                                  //| 5S)
 
 }
