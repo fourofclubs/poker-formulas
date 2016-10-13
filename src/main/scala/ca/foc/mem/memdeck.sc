@@ -1,4 +1,5 @@
 package ca.foc.mem
+import PokerFormulas._
 
 object memdeck {
   def acaan(c: Card, n: Int): Card = {
@@ -6,11 +7,33 @@ object memdeck {
     val cut = ((m - n + 51) % 51) + 1
     MemDeck.cut(cut).bottom
   }                                               //> acaan: (c: ca.foc.mem.Card, n: Int)ca.foc.mem.Card
-  PokerFormulas.SF(S, v8)                         //> res0: scala.collection.immutable.Set[ca.foc.mem.Card] = Set(7S, 4S, 6S, 5S, 
-                                                  //| 8S)
-	MemDeck.cut(15)                           //> res1: ca.foc.mem.Deck = Deck(List(2C, 10C, 5D, 2S, 4D, 2H, QH, 7C, JD, 8S, 1
-                                                  //| 0D, 5S, 9H, 4C, QC, AD, 3H, JS, 6H, AC, 9C, 7D, 4S, 6D, AS, JH, 6C, KD, 10S,
-                                                  //|  QD, 7S, 8H, 3C, JC, 3D, AH, 2D, KS, 4H, KH, 8C, 9D, 6S, 8D, 3S, 10H, 5C, KC
-                                                  //| , QS, 5H, 9S, 7H))
+  PokerFormulas.find(MemDeck.cut(37), List(isValue(K), isValue(v3), isValue(v3)), 6)
+                                                  //> res0: List[List[Int]] = List(List(0, 5, 1), List(6, 5, 1))
+
+  def test(d: Deck, players: Int) = Deck(d.cardAt(players) :: d.drop(players + 1).cards)
+                                                  //> test: (d: ca.foc.mem.Deck, players: Int)ca.foc.mem.Deck
+  val d = MemDeck.cut(43)                         //> d  : ca.foc.mem.Deck = Deck(List(10S, QD, 7S, 8H, 3C, JC, 3D, AH, 2D, KS, 4H
+                                                  //| , KH, 8C, 9D, 6S, 8D, 3S, 10H, 5C, KC, QS, 5H, 9S, 7H, 2C, 10C, 5D, 2S, 4D, 
+                                                  //| 2H, QH, 7C, JD, 8S, 10D, 5S, 9H, 4C, QC, AD, 3H, JS, 6H, AC, 9C, 7D, 4S, 6D,
+                                                  //|  AS, JH, 6C, KD))
+  d.cardAt(5)                                     //> res1: ca.foc.mem.Card = 3C
+  d.cardAt(6)                                     //> res2: ca.foc.mem.Card = JC
+  test(d, 6)                                      //> res3: ca.foc.mem.Deck = Deck(List(JC, AH, 2D, KS, 4H, KH, 8C, 9D, 6S, 8D, 3S
+                                                  //| , 10H, 5C, KC, QS, 5H, 9S, 7H, 2C, 10C, 5D, 2S, 4D, 2H, QH, 7C, JD, 8S, 10D,
+                                                  //|  5S, 9H, 4C, QC, AD, 3H, JS, 6H, AC, 9C, 7D, 4S, 6D, AS, JH, 6C, KD))
+  PokerFormulas.find(MemDeck.cut(41), List(isValue(v3), isValue(v8), isValue(v3), isValue(v8), isValue(v3)), 9)
+                                                  //> res4: List[List[Int]] = List()
+  PokerFormulas.find(MemDeck.cut(25), List(isValue(v3)), 9)
+                                                  //> res5: List[List[Int]] = List(List(7))
+  PokerFormulas.find(MemDeck.cut(16), List(isValue(v8), isValue(v3)), 9)
+                                                  //> res6: List[List[Int]] = List(List(0, 7), List(9, 7))
+  PokerFormulas.find(MemDeck.cut(50), List(isValue(v8), isValue(v3), isValue(v8), isValue(v3)), 9)
+                                                  //> res7: List[List[Int]] = List(List(0, 1, 0, 7), List(0, 1, 9, 7), List(6, 1, 
+                                                  //| 0, 7), List(6, 1, 9, 7))
+  MemDeck.cardAt(32)                              //> res8: ca.foc.mem.Card = 3H
+  PokerFormulas.find(MemDeck.cut(41), List(isValue(v3), isValue(v8), isValue(v3), isValue(v8)), 9)
+                                                  //> res9: List[List[Int]] = List(List(0, 0, 1, 0), List(0, 0, 1, 9), List(0, 6, 
+                                                  //| 1, 0), List(0, 6, 1, 9), List(7, 0, 1, 0), List(7, 0, 1, 9), List(7, 6, 1, 0
+                                                  //| ), List(7, 6, 1, 9))
 
 }
