@@ -7,11 +7,10 @@ import scala.annotation.migration
 object PokerFormulas extends App {
   def findHand(d: Deck, h: Hand, players: Int): Option[DealInfo] = {
     def evaluate(players: Int, d: DealInfo): Int = (d.seconds.sum + (d.seconds.count(_ == 0) * players * 3))
-    def find[C >: Card](d: Deck, ps: List[C ⇒ Boolean], players: Int): List[List[Int]] = {
-      if (d.size < players) List()
-      else ps match {
-        case List() ⇒ List(List())
-        case p :: ps2 ⇒ {
+    def find[C >: Card](d: Deck, ps: List[C ⇒ Boolean], players: Int): List[List[Int]] = ps match {
+      case List() ⇒ List(List())
+      case p :: ps2 ⇒ {
+        if (d.size < players) List() else {
           val s1 = if (p(d.cardAt(players))) find(d.drop(players), ps2, players).map(0 :: _) else List()
           val s2 =
             if (d.size > players && p(d.cardAt(players + 1)))
