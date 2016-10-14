@@ -1,5 +1,6 @@
 package ca.foc
-import scala.collection.immutable.SortedMap
+
+import scala.annotation.migration
 
 package object mem {
   sealed trait Suit
@@ -47,22 +48,23 @@ package object mem {
     def positionOf(c: Card) = cards.indexOf(c) + 1
     def size = cards.size
     def drop(n: Int) = Deck(cards.drop(n))
+    def cut(n: Int) = Deck(cards.drop(n) ++ cards.take(n))
+    def deal: (Deck, Card) = (drop(1), top)
+    def dealSecond: (Deck, Card) = (Deck(top :: drop(2).cards), cardAt(2))
+    def dealBottom: (Deck, Card) = (Deck(cards.dropRight(1)), bottom)
   }
-  object MemDeck extends Deck(List((K, S), (v4, H), (K, H), (v8, C), (v9, D), (v6, S), (v8, D), (v3, S), (v10, H),
+  val NewDeck = Deck(((for (v <- VALUES.toList.sorted) yield (v, H)) ++
+    (for (v <- VALUES.toList.sorted) yield (v, C)) ++
+    (for (v <- VALUES.toList.sorted.reverse) yield (v, D)) ++
+    (for (v <- VALUES.toList.sorted.reverse) yield (v, S))).map(toCard))
+  val MemDeck = Deck(List((K, S), (v4, H), (K, H), (v8, C), (v9, D), (v6, S), (v8, D), (v3, S), (v10, H),
     (v5, C), (K, C), (Q, S), (v5, H), (v9, S), (v7, H), (v2, C), (v10, C), (v5, D), (v2, S), (v4, D), (v2, H), (Q, H),
     (v7, C), (J, D), (v8, S), (v10, D), (v5, S), (v9, H), (v4, C), (Q, C), (A, D), (v3, H), (J, S), (v6, H), (A, C),
     (v9, C), (v7, D), (v4, S), (v6, D), (A, S), (J, H), (v6, C), (K, D), (v10, S), (Q, D), (v7, S), (v8, H), (v3, C),
-    (J, C), (v3, D), (A, H), (v2, D)).map(toCard))
-
-  def cut(d: Deck, n: Int) = Deck(d.cards.drop(n) ++ d.cards.take(n))
-
-  case class DeckOps(d: Deck) {
-    def cut(n: Int) = mem.cut(d, n)
-  }
+    (J, C), (v3, D), (A, H), (v2, D)))
 
   private val valueIndex = Map(1 -> A, 2 -> v2, 3 -> v3, 4 -> v4, 5 -> v5, 6 -> v6, 7 -> v7, 8 -> v8,
     9 -> v9, 10 -> v10, 11 -> J, 12 -> Q, 13 -> K)
   implicit def toCard(c: (CardVal, Suit)): Card = Card(c._1, c._2)
   implicit def intToCard(c: (Int, Suit)): Card = Card(valueIndex(c._1), c._2)
-  implicit def deckToDeckOps(d: Deck): DeckOps = DeckOps(d)
 }

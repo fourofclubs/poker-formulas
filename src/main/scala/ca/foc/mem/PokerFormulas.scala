@@ -5,24 +5,35 @@ import java.io.{ File, PrintStream }
 import scala.annotation.migration
 
 object PokerFormulas extends App {
-  def find[C >: Card](d: Deck, ps: List[C ⇒ Boolean], players: Int): List[List[Int]] =
-    if (d.size < players) List()
-    else ps match {
-      case List() ⇒ List(List())
-      case p :: ps2 ⇒ {
-        val s1 = if (p(d.cardAt(players))) find(d.drop(players), ps2, players).map(0 :: _) else List()
-        val s2 =
-          if (d.size > players && p(d.cardAt(players + 1)))
-            find(Deck(d.cardAt(players) :: d.drop(players + 1).cards), ps2, players).map(players :: _)
-          else List()
-        val s3 = {
-          val index = d.cards.take(players).indexWhere(p)
-          if (index >= 0) find(d.drop(players), ps2, players).map(index + 1 :: _)
-          else List()
+  def findHand(d: Deck, h: Hand, players: Int): Option[DealInfo] = {
+    def evaluate(players: Int, d: DealInfo): Int = (d.seconds.sum + (d.seconds.count(_ == 0) * players * 3))
+    def find[C >: Card](d: Deck, ps: List[C ⇒ Boolean], players: Int): List[List[Int]] = {
+      if (d.size < players) List()
+      else ps match {
+        case List() ⇒ List(List())
+        case p :: ps2 ⇒ {
+          val s1 = if (p(d.cardAt(players))) find(d.drop(players), ps2, players).map(0 :: _) else List()
+          val s2 =
+            if (d.size > players && p(d.cardAt(players + 1)))
+              find(Deck(d.cardAt(players) :: d.drop(players + 1).cards), ps2, players).map(players :: _)
+            else List()
+          val s3 = {
+            val index = d.cards.take(players).indexWhere(p)
+            if (index >= 0) find(d.drop(players), ps2, players).map(index + 1 :: _)
+            else List()
+          }
+          s1 ++ s2 ++ s3
         }
-        s1 ++ s2 ++ s3
       }
     }
+    val deals = {
+      for (
+        cut <- (0 to 51).par;
+        s <- h.searchers.par
+      ) yield (find(d.cut(cut), s, players)).map(DealInfo(cut, _))
+    }.flatten
+    if (deals.isEmpty) None else Some(deals.maxBy(evaluate(players, _)))
+  }
 
   case class Predicate[-A](p: A => Boolean) extends (A => Boolean) {
     def apply(a: A) = p(a)
@@ -100,24 +111,16 @@ object PokerFormulas extends App {
       (for (s <- SUITS) yield RoyalFlush(s))
   }
 
-  def evaluate(players: Int)(d: DealInfo) = (d.seconds.sum + (d.seconds.count(_ == 0) * players * 2))
   case class HandInfo(hand: Hand, players: Int)
   case class DealInfo(cut: Int, seconds: List[Int])
-  val seconds = {
-    for (
-      cut ← (0 to 51).par;
-      d ← List(MemDeck.cut(cut));
-      h ← HANDS.par;
-      s <- h.searchers;
-      players ← 3 to 10
-    ) yield HandInfo(h, players) -> find(d, s, players).map(s => DealInfo(cut, s))
-  }.toList.filter(!_._2.isEmpty).map(p => p._1 -> p._2.maxBy(evaluate(p._1.players)_)).toMap
+
+  val seconds = (for (
+    players <- 3 to 10;
+    h <- HANDS;
+    d <- findHand(MemDeck, h, players)
+  ) yield HandInfo(h, players) -> d).toMap
 
   def fmt(h: HandInfo)(d: DealInfo) = s"${h.hand.toString}, ${h.players} : ${d.cut}-${d.seconds.mkString(",")}"
-
-  val fh = new File("pokerFormulas-FH.csv")
-  fh.delete()
-  val pfh = new PrintStream(fh)
 
   val sortedValues = VALUES.toList.sortBy(v => if (v == A) 14 else v.intVal).reverse
   val t = for (v1 <- sortedValues) yield {
@@ -130,7 +133,11 @@ object PokerFormulas extends App {
       }
     }.mkString("\t")
   }.mkString("\n")
-  println(t.mkString("\n\n"))
+
+  val fh = new File("pokerFormulas-FH.csv")
+  fh.delete()
+  val pfh = new PrintStream(fh)
+  pfh.println(t.mkString("\n\n"))
 
   //  for ((h, d) <- seconds.toList.sortBy(_._1.players).sortBy(_._1.hand.toString))
   //    ps.println(h.hand.toString + ", " + h.players + ": " + d.cut + "-" + d.seconds.mkString(","))
