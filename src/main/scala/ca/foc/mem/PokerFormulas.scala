@@ -27,31 +27,31 @@ object PokerFormulas extends App {
     }
     val deals = {
       for (
-        cut <- (0 to 51).par;
-        s <- h.searchers.par
+        cut ← (0 to 51).par;
+        s ← h.searchers.par
       ) yield (find(d.cut(cut), s, players)).map(DealInfo(cut, _))
     }.flatten
     if (deals.isEmpty) None else Some(deals.maxBy(evaluate(players, _)))
   }
 
-  case class Predicate[-A](p: A => Boolean) extends (A => Boolean) {
+  case class Predicate[-A](p: A ⇒ Boolean) extends (A ⇒ Boolean) {
     def apply(a: A) = p(a)
-    def &&[B <: A](p2: B => Boolean) = Predicate[B](a => p(a) && p2(a))
-    def ||[B <: A](p2: B => Boolean) = Predicate[B](a => p(a) || p2(a))
-    def unary_! = Predicate[A](a => !p(a))
+    def &&[B <: A](p2: B ⇒ Boolean) = Predicate[B](a ⇒ p(a) && p2(a))
+    def ||[B <: A](p2: B ⇒ Boolean) = Predicate[B](a ⇒ p(a) || p2(a))
+    def unary_! = Predicate[A](a ⇒ !p(a))
   }
-  implicit def functionToPredicate[A](p: A => Boolean): Predicate[A] = Predicate(p)
+  implicit def functionToPredicate[A](p: A ⇒ Boolean): Predicate[A] = Predicate(p)
 
   val any = (c: Card) ⇒ true
   def isValue(v: CardVal) = (c: Card) ⇒ c.value == v
-  def isSuit(s: Suit) = (c: Card) => c.suit == s
-  def isCard(c: Card) = (c2: Card) => c2 == c
-  def isCard(v: CardVal, s: Suit): Card => Boolean = isCard(Card(v, s))
-  def isLower(v: CardVal) = (c: Card) => c.value.intVal < v.intVal && c.value != A
-  def inRange(n1: Int, n2: Int) = (c: Card) => (n1 to n2).contains(c.value.intVal)
+  def isSuit(s: Suit) = (c: Card) ⇒ c.suit == s
+  def isCard(c: Card) = (c2: Card) ⇒ c2 == c
+  def isCard(v: CardVal, s: Suit): Card ⇒ Boolean = isCard(Card(v, s))
+  def isLower(v: CardVal) = (c: Card) ⇒ c.value.intVal < v.intVal && c.value != A
+  def inRange(n1: Int, n2: Int) = (c: Card) ⇒ (n1 to n2).contains(c.value.intVal)
 
   sealed trait Hand {
-    def searchers: Iterable[List[Card => Boolean]]
+    def searchers: Iterable[List[Card ⇒ Boolean]]
     def verify(cards: List[Card]): Boolean
   }
   case class TwoPair(v1: CardVal, v2: CardVal) extends Hand {
@@ -82,7 +82,7 @@ object PokerFormulas extends App {
     override def toString = s"F($s,$highVal)"
     val searchers = (isCard(highVal, s) :: List.fill(4)(isSuit(s) && isLower(highVal))).permutations.toSet
     def verify(cards: List[Card]) = cards.forall(isSuit(s)) &&
-      cards.maxBy(c => if (c.value == A) 14 else c.value.intVal).value == highVal
+      cards.maxBy(c ⇒ if (c.value == A) 14 else c.value.intVal).value == highVal
   }
   case class FullHouse(v1: CardVal, v2: CardVal) extends Hand {
     override def toString = s"$v1/$v2"
@@ -102,30 +102,30 @@ object PokerFormulas extends App {
       cards.contains((J, s)) && cards.contains((v10, s))
   }
   val HANDS: Set[Hand] = {
-    (for (v1 <- VALUES; v2 <- VALUES; if (v1 != v2)) yield TwoPair(v1, v2)) ++
-      (for (v <- VALUES) yield Trips(v)) ++
-      (for (v <- VALUES; if v.intVal >= 5 || v == A) yield Straight(v)) ++
-      (for (v1 <- VALUES; v2 <- VALUES; if (v1 != v2)) yield FullHouse(v1, v2)) ++
-      (for (s <- SUITS; v <- VALUES; if (v.intVal >= 5)) yield StraightFlush(s, v)) ++
-      (for (s <- SUITS) yield RoyalFlush(s))
+    (for (v1 ← VALUES; v2 ← VALUES; if (v1 != v2)) yield TwoPair(v1, v2)) ++
+      (for (v ← VALUES) yield Trips(v)) ++
+      (for (v ← VALUES; if v.intVal >= 5 || v == A) yield Straight(v)) ++
+      (for (v1 ← VALUES; v2 ← VALUES; if (v1 != v2)) yield FullHouse(v1, v2)) ++
+      (for (s ← SUITS; v ← VALUES; if (v.intVal >= 5)) yield StraightFlush(s, v)) ++
+      (for (s ← SUITS) yield RoyalFlush(s))
   }
 
   case class HandInfo(hand: Hand, players: Int)
   case class DealInfo(cut: Int, seconds: List[Int])
 
   val seconds = (for (
-    players <- 3 to 10;
-    h <- HANDS;
-    d <- findHand(MemDeck, h, players)
+    players ← 3 to 10;
+    h ← HANDS;
+    d ← findHand(MemDeck, h, players)
   ) yield HandInfo(h, players) -> d).toMap
 
   def fmt(h: HandInfo)(d: DealInfo) = s"${h.hand.toString}, ${h.players} : ${d.cut}-${d.seconds.mkString(",")}"
 
-  val sortedValues = VALUES.toList.sortBy(v => if (v == A) 14 else v.intVal).reverse
-  val t = for (v1 <- sortedValues) yield {
-    for (p <- 3 to 10) yield {
+  val sortedValues = VALUES.toList.sortBy(v ⇒ if (v == A) 14 else v.intVal).reverse
+  val t = for (v1 ← sortedValues) yield {
+    for (p ← 3 to 10) yield {
       for (
-        v2 <- sortedValues.filterNot(_ == v1)
+        v2 ← sortedValues.filterNot(_ == v1)
       ) yield {
         val h = HandInfo(FullHouse(v1, v2), p)
         seconds.get(h).map(fmt(h)_).getOrElse("")
