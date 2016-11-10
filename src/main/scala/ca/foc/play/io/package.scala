@@ -1,4 +1,4 @@
-package ca.foc
+package ca.foc.play
 
 import ca.foc.play.monads.{ Monad, MonadOps }
 import ca.foc.play.par.Par

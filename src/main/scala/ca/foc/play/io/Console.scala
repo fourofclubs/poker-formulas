@@ -1,9 +1,7 @@
-package ca.foc.io
+package ca.foc.play.io
 
 import scala.io.StdIn._
-
 import ca.foc.play.par.Par
-import ca.foc.play.monads.Monad
 
 sealed trait Console[A] {
   def toPar: Par[A]

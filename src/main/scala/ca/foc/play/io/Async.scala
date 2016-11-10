@@ -1,7 +1,6 @@
-package ca.foc.io
+package ca.foc.play.io
 
 import scala.io.StdIn.readLine
-
 import ca.foc.play.monads.{ Monad, MonadOps }
 import ca.foc.play.par.Par
 
