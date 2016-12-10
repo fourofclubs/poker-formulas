@@ -4,7 +4,7 @@ import java.io.{ File, PrintStream }
 
 import scala.annotation.migration
 
-object PokerFormulas extends App {
+object PokerFormulas {
   def findHand(d: Deck, h: Hand, players: Int): Option[DealInfo] = {
     def evaluate(players: Int, d: DealInfo): Int = (d.seconds.sum + (d.seconds.count(_ == 0) * players * 3))
     def find[C >: Card](d: Deck, ps: List[C ⇒ Boolean], players: Int): List[List[Int]] = ps match {
@@ -118,26 +118,4 @@ object PokerFormulas extends App {
     h ← HANDS;
     d ← findHand(MemDeck, h, players)
   ) yield HandInfo(h, players) -> d).toMap
-
-  def fmt(h: HandInfo)(d: DealInfo) = s"${h.hand.toString}, ${h.players} : ${d.cut}-${d.seconds.mkString(",")}"
-
-  val sortedValues = VALUES.toList.sortBy(v ⇒ if (v == A) 14 else v.intVal).reverse
-  val t = for (v1 ← sortedValues) yield {
-    for (p ← 3 to 10) yield {
-      for (
-        v2 ← sortedValues.filterNot(_ == v1)
-      ) yield {
-        val h = HandInfo(FullHouse(v1, v2), p)
-        seconds.get(h).map(fmt(h)_).getOrElse("")
-      }
-    }.mkString("\t")
-  }.mkString("\n")
-
-  val fh = new File("pokerFormulas-FH.csv")
-  fh.delete()
-  val pfh = new PrintStream(fh)
-  pfh.println(t.mkString("\n\n"))
-
-  //  for ((h, d) <- seconds.toList.sortBy(_._1.players).sortBy(_._1.hand.toString))
-  //    ps.println(h.hand.toString + ", " + h.players + ": " + d.cut + "-" + d.seconds.mkString(","))
 }
