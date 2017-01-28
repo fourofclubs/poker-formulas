@@ -47,7 +47,7 @@ object PokerFormulas extends App {
   def isSuit(s: Suit) = (c: Card) ⇒ c.suit == s
   def isCard(c: Card) = (c2: Card) ⇒ c2 == c
   def isCard(v: CardVal, s: Suit): Card ⇒ Boolean = isCard(Card(v, s))
-  def isLower(v: CardVal) = (c: Card) ⇒ c.value.intVal < v.intVal && c.value != A
+  def isLower(v: CardVal) = (c: Card) ⇒ c.value.intVal < v.intVal || (v == A && c.value != A)
   def inRange(n1: Int, n2: Int) = (c: Card) ⇒ (n1 to n2).contains(c.value.intVal)
 
   sealed trait Hand {
@@ -89,6 +89,11 @@ object PokerFormulas extends App {
     val searchers = List(isValue(v1), isValue(v1), isValue(v1), isValue(v2), isValue(v2)).permutations.toSet
     def verify(cards: List[Card]) = cards.count(_.value == v1) == 3 && cards.count(_.value == v2) == 2
   }
+  case class Quads(v: CardVal) extends Hand {
+    override def toString = s"Q$v"
+    val searchers = (any :: List.fill(4)(isValue(v))).permutations.toSet
+    def verify(cards: List[Card]) = cards.count(_.value == v) == 4
+  }
   case class StraightFlush(s: Suit, highVal: CardVal) extends Hand {
     override def toString = s"SF($s,$highVal)"
     val searchers = List.fill(5)(isSuit(s) && inRange(highVal.intVal - 4, highVal.intVal)).permutations.toSet
@@ -105,7 +110,9 @@ object PokerFormulas extends App {
     (for (v1 ← VALUES; v2 ← VALUES; if (v1 != v2)) yield TwoPair(v1, v2)) ++
       (for (v ← VALUES) yield Trips(v)) ++
       (for (v ← VALUES; if v.intVal >= 5 || v == A) yield Straight(v)) ++
+      (for (s ← SUITS; v ← VALUES; if (v.intVal > 5 || v == A)) yield Flush(s, v)) ++
       (for (v1 ← VALUES; v2 ← VALUES; if (v1 != v2)) yield FullHouse(v1, v2)) ++
+      (for (v ← VALUES) yield Quads(v)) ++
       (for (s ← SUITS; v ← VALUES; if (v.intVal >= 5)) yield StraightFlush(s, v)) ++
       (for (s ← SUITS) yield RoyalFlush(s))
   }
@@ -114,30 +121,50 @@ object PokerFormulas extends App {
   case class DealInfo(cut: Int, seconds: List[Int])
 
   val seconds = (for (
-    players ← 3 to 10;
-    h ← HANDS;
+    players ← (3 to 10).par;
+    h ← HANDS.par;
     d ← findHand(MemDeck, h, players)
   ) yield HandInfo(h, players) -> d).toMap
 
   def fmt(h: HandInfo)(d: DealInfo) = s"${h.hand.toString}, ${h.players} : ${d.cut}-${d.seconds.mkString(",")}"
-
   val sortedValues = VALUES.toList.sortBy(v ⇒ if (v == A) 14 else v.intVal).reverse
-  val t = for (v1 ← sortedValues) yield {
+  def format(hand: CardVal ⇒ Hand): String = {
     for (p ← 3 to 10) yield {
-      for (
-        v2 ← sortedValues.filterNot(_ == v1)
-      ) yield {
-        val h = HandInfo(FullHouse(v1, v2), p)
+      for (v ← sortedValues) yield {
+        val h = HandInfo(hand(v), p)
         seconds.get(h).map(fmt(h)_).getOrElse("")
       }
     }.mkString("\t")
   }.mkString("\n")
+  def format(hand: (Suit, CardVal) ⇒ Hand): String = {
+    for (s ← SUITS) yield {
+      format((v: CardVal) ⇒ hand(s, v))
+    }
+  }.mkString("\n\n")
+
+  val twoPairs = (for (v1 ← sortedValues) yield { format((v2: CardVal) ⇒ TwoPair(v1, v2)) }).mkString("\n\n")
+  val trips = format((v: CardVal) ⇒ Trips(v))
+  val straights = format((v: CardVal) ⇒ Straight(v))
+  val flushes = format((s: Suit, v: CardVal) ⇒ Flush(s, v))
+  val fullHouses = (for (v1 ← sortedValues) yield { format((v2: CardVal) ⇒ FullHouse(v1, v2)) }).mkString("\n\n")
+  val quads = format((v: CardVal) ⇒ Quads(v))
+  val straightFlushes = format((s: Suit, v: CardVal) ⇒ if (v == A) RoyalFlush(s) else StraightFlush(s, v))
 
   val fh = new File("pokerFormulas-FH.csv")
   fh.delete()
   val pfh = new PrintStream(fh)
-  pfh.println(t.mkString("\n\n"))
+  pfh.println(fullHouses)
+  pfh.close()
 
-  //  for ((h, d) <- seconds.toList.sortBy(_._1.players).sortBy(_._1.hand.toString))
-  //    ps.println(h.hand.toString + ", " + h.players + ": " + d.cut + "-" + d.seconds.mkString(","))
+  val tsfqsf = new File("pokerFormulas-TSFQSF.csv")
+  tsfqsf.delete()
+  val ptsfqsf = new PrintStream(tsfqsf)
+  ptsfqsf.println(List(trips, straights, flushes, quads, straightFlushes).mkString("\n\n"))
+  ptsfqsf.close()
+
+  val tp = new File("pokerFormulas-TwoPair.csv")
+  tp.delete()
+  val ptp = new PrintStream(tp)
+  ptp.println(twoPairs)
+  ptp.close()
 }
