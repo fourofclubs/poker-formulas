@@ -52,6 +52,8 @@ package object mem {
     def deal: (Deck, Card) = (drop(1), top)
     def dealSecond: (Deck, Card) = (Deck(top :: drop(2).cards), cardAt(2))
     def dealBottom: (Deck, Card) = (Deck(cards.dropRight(1)), bottom)
+    def remove(n: Int): (Deck, Card) = (Deck(cards.take(n - 1) ++ cards.drop(n + 1)), cardAt(n))
+    def insert(card: Card, n: Int) = Deck(cards.take(n - 1) ++ (card :: cards.drop(n - 1)))
   }
   val NewDeck = Deck(((for (v <- VALUES.toList.sorted) yield (v, H)) ++
     (for (v <- VALUES.toList.sorted) yield (v, C)) ++
