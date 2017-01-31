@@ -47,7 +47,7 @@ object PokerFormulas {
   def isSuit(s: Suit) = (c: Card) ⇒ c.suit == s
   def isCard(c: Card) = (c2: Card) ⇒ c2 == c
   def isCard(v: CardVal, s: Suit): Card ⇒ Boolean = isCard(Card(v, s))
-  def isLower(v: CardVal) = (c: Card) ⇒ c.value.intVal < v.intVal && c.value != A
+  def isLower(v: CardVal) = (c: Card) ⇒ c.value.intVal < v.intVal || (v == A && c.value != A)
   def inRange(n1: Int, n2: Int) = (c: Card) ⇒ (n1 to n2).contains(c.value.intVal)
 
   sealed trait Hand {
@@ -89,6 +89,11 @@ object PokerFormulas {
     val searchers = List(isValue(v1), isValue(v1), isValue(v1), isValue(v2), isValue(v2)).permutations.toSet
     def verify(cards: List[Card]) = cards.count(_.value == v1) == 3 && cards.count(_.value == v2) == 2
   }
+  case class Quads(v: CardVal) extends Hand {
+    override def toString = s"Q$v"
+    val searchers = (any :: List.fill(4)(isValue(v))).permutations.toSet
+    def verify(cards: List[Card]) = cards.count(_.value == v) == 4
+  }
   case class StraightFlush(s: Suit, highVal: CardVal) extends Hand {
     override def toString = s"SF($s,$highVal)"
     val searchers = List.fill(5)(isSuit(s) && inRange(highVal.intVal - 4, highVal.intVal)).permutations.toSet
@@ -105,7 +110,9 @@ object PokerFormulas {
     (for (v1 ← VALUES; v2 ← VALUES; if (v1 != v2)) yield TwoPair(v1, v2)) ++
       (for (v ← VALUES) yield Trips(v)) ++
       (for (v ← VALUES; if v.intVal >= 5 || v == A) yield Straight(v)) ++
+      (for (s ← SUITS; v ← VALUES; if (v.intVal > 5 || v == A)) yield Flush(s, v)) ++
       (for (v1 ← VALUES; v2 ← VALUES; if (v1 != v2)) yield FullHouse(v1, v2)) ++
+      (for (v ← VALUES) yield Quads(v)) ++
       (for (s ← SUITS; v ← VALUES; if (v.intVal >= 5)) yield StraightFlush(s, v)) ++
       (for (s ← SUITS) yield RoyalFlush(s))
   }
@@ -114,8 +121,8 @@ object PokerFormulas {
   case class DealInfo(cut: Int, seconds: List[Int])
 
   val seconds = (for (
-    players ← 3 to 10;
-    h ← HANDS;
+    players ← (3 to 10).par;
+    h ← HANDS.par;
     d ← findHand(MemDeck, h, players)
   ) yield HandInfo(h, players) -> d).toMap
 }
