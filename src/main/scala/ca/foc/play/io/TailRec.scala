@@ -4,6 +4,8 @@ import scala.io.StdIn.readLine
 import ca.foc.play.monads.{ Monad, MonadOps }
 
 object IO {
+  def apply[A](a: => A) = TailRec.unit(a)
+  
   sealed trait TailRec[A] {
     def run = IO.run(this)
     def map[B](f: A => B): TailRec[B] = flatMap(f andThen (Return(_)))
