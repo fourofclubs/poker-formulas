@@ -1,10 +1,14 @@
 package ca.foc.play.io
 
-import scala.io.StdIn.readLine
-import ca.foc.play.monads.{ Monad, MonadOps }
+import scala.io.StdIn
+import scala.language.implicitConversions
+
+import ca.foc.play.monads.Monad
+import ca.foc.play.monads.MonadOps
 import ca.foc.play.par.Par
 
 object IO2 {
+  type IO[A] = Async[A]
   sealed trait Async[A] {
     def run = IO2.run(this)
     def map[B](f: A => B): Async[B] = flatMap(f andThen (Return(_)))
@@ -37,7 +41,7 @@ object IO2 {
   }
 
   def PrintLine(s: String): Async[Unit] = Suspend(Par.lazyUnit(println(s)))
-  val ReadLine: Async[String] = Suspend(Par.lazyUnit(readLine))
+  val ReadLine: Async[String] = Suspend(Par.lazyUnit(StdIn.readLine))
   val echo = ReadLine.flatMap(PrintLine(_))
   val readInt = ReadLine.map(_.toInt)
 }

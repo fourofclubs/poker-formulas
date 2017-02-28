@@ -5,9 +5,6 @@
 	<artifactId>scala-playground</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<properties>
-		<scala.version>2.11.6</scala.version>
-	</properties>
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -48,6 +45,9 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<addScalacArgs>-feature|-deprecation</addScalacArgs>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -65,14 +65,14 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>org.scala-lang</groupId>
-			<artifactId>scala-library</artifactId>
-			<version>${scala.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.joda</groupId>
+			<artifactId>joda-convert</artifactId>
+			<version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -84,6 +84,16 @@
 			<groupId>org.scalaz</groupId>
 			<artifactId>scalaz-core_2.11</artifactId>
 			<version>7.2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.scalaz</groupId>
+			<artifactId>scalaz-effect_2.11</artifactId>
+			<version>7.2.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.scalaz.stream</groupId>
+			<artifactId>scalaz-stream_2.11</artifactId>
+			<version>0.8.5</version>
 		</dependency>
 	</dependencies>
 </project>

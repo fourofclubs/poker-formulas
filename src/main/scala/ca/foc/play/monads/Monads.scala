@@ -1,15 +1,23 @@
 package ca.foc.play.monads
 
+import java.text.ParseException
 import java.util.Date
 
-import scala.{ Left, Right, Stream, Vector }
+import scala.Left
+import scala.Right
+import scala.Stream
+import scala.Vector
+import scala.language.higherKinds
 
 import ca.foc.play.State
-import ca.foc.play.monoids.{ Foldable, Monoid }
-import ca.foc.play.par.Par
-import ca.foc.play.parsing.{ Parser, ParsersImpl }
+import ca.foc.play.monoids.Foldable
+import ca.foc.play.monoids.Monoid
+import ca.foc.play.parsing.ParsersImpl
 import ca.foc.play.testing.Gen
-import java.text.ParseException
+import scala.language.implicitConversions
+import ca.foc.play.par.Par
+import ca.foc.play.parsing.Parser
+import scala.collection.immutable.Iterable
 
 trait Functor[F[_]] {
   def map[A, B](fa: F[A])(f: A => B): F[B]

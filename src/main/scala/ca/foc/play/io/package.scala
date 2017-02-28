@@ -1,10 +1,16 @@
 package ca.foc.play
 
-import ca.foc.play.monads.{ Monad, MonadOps }
-import ca.foc.play.par.Par
+import scala.language.higherKinds
+import scala.language.implicitConversions
+
 import ca.foc.play.monads.Monad
+import ca.foc.play.monads.MonadOps
+import ca.foc.play.par.Par
+import ca.foc.play.io.IO2.IO
+import scala.concurrent.Future
 
 package object io {
+  type IO[A] = Free[Par, A]
   sealed trait Free[F[_], A] {
     def run(implicit F: Monad[F]) = io.run(this)
     def map[B](f: A => B): Free[F, B] = flatMap(f andThen (Return(_)))
@@ -139,4 +145,10 @@ package object io {
         lazy val value = xs.toArray
       })
   }
+
+  import java.util.concurrent.ExecutorService
+  def unsafePerformIO[A](io: IO[A])(implicit E: ExecutorService): A =
+    Par.run(E) {
+      run(io)(parMonad)
+    }.get
 }

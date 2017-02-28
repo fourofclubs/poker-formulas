@@ -1,8 +1,6 @@
 package ca.foc.mem
 
-import java.io.{ File, PrintStream }
-
-import scala.annotation.migration
+import scala.language.implicitConversions
 
 object PokerFormulas {
   def findHand(d: Deck, h: Hand, players: Int): Option[DealInfo] = {

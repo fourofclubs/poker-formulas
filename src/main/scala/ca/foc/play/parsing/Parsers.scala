@@ -1,5 +1,7 @@
 package ca.foc.play.parsing
 
+import scala.language.higherKinds
+import scala.language.implicitConversions
 import scala.util.matching.Regex
 
 import ca.foc.play.testing._

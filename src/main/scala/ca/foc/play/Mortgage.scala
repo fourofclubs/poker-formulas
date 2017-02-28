@@ -2,44 +2,49 @@ package ca.foc.play
 
 import java.text.NumberFormat
 
-import scala.math._
+import scala.io.StdIn.readLine
+import scala.math.min
 
 import org.joda.time.DateTime
-import org.joda.time.DateTimeConstants._
+import org.joda.time.DateTimeConstants.FRIDAY
 import org.joda.time.format.DateTimeFormat
 
+import scalaz._
+import scalaz.effect.IO
+import scalaz.std.list.listInstance
+
 object Mortgage extends App {
+  val DF = DateTimeFormat.forPattern("dd-MMM-yyyy")
+  val NF = NumberFormat.getCurrencyInstance
   val date = DateTime.now().withDayOfWeek(FRIDAY).minusWeeks(1)
-  val start = 15485.02
-  val interestRate = 0.0293
+  val interestRate = 0.0279
 
-  val initial = Payment.startingAt(date, start)
-  val payments1 = initial.subsequent(interestRate, 144)
-  val payments2 = initial.subsequent(interestRate, 225)
+  def formatPayment(p: Payment) = s"${DF.print(p.date)}: Remaining: ${NF.format(p.remaining)}, " +
+    s"Paid: ${NF.format(p.paid)}, Interest: ${NF.format(p.interest)}, Total Interest: ${NF.format(p.totalInterest)}"
 
-  println({
-    for ((p1, p2) <- payments1 zip payments2)
-      yield s"${p1} ... ${p2} : ${p2.paid - p1.paid}"
-  }.mkString("\n"))
+  val io =
+    for (
+      initialPayment <- IO { readLine("Current Balance?").toDouble }.map(Payment.startingAt(date, _));
+      payments <- IO { readLine("Weekly Payments?").toDouble }.map(initialPayment.subsequent(interestRate, _).toList);
+      _ <- Traverse[List].traverse(payments)(p => IO { println(formatPayment(p)) });
+      _ <- IO { println(s"${payments.tail.size} weeks left. Total interest: ${NF.format(payments.last.totalInterest)}") }
+    ) yield ()
+
+  io.unsafePerformIO()
 }
 
 case class Payment(date: DateTime, remaining: Double, paid: Double, interest: Double, totalInterest: Double) {
-  private val DF = DateTimeFormat.forPattern("dd-MMM-yyyy")
-  private val NF = NumberFormat.getCurrencyInstance
-  override def toString = DF.print(date) + ": Remaining: " + NF.format(remaining) + ", Paid: " +
-    NF.format(paid) + ", Interest: " + NF.format(interest) + ", Total Interest: " + NF.format(totalInterest)
-  def next(interestRate: Double, weeklyPayment: Double) = Payment.next(interestRate, weeklyPayment)(this)
-  def subsequent(interestRate: Double, weeklyPayment: Double): List[Payment] =
-    Stream.iterate[Option[Payment]](Some(this))(_.flatMap(Payment.next(interestRate, weeklyPayment)))
-      .takeWhile(_.isDefined).map(_.get).toList
+  def next(interestRate: Double, weeklyPayment: Double): Option[Payment] = if (this.remaining <= 0) None else {
+    val interest = (this.remaining * interestRate) / 52.0
+    val paid = this.paid + min(weeklyPayment, this.remaining + interest)
+    val remaining = this.remaining - min(weeklyPayment - interest, this.remaining)
+    Some(Payment(this.date.plusWeeks(1), remaining, paid, interest, this.totalInterest + interest))
+  }
+  def subsequent(interestRate: Double, weeklyPayment: Double): Stream[Payment] =
+    Stream.iterate[Option[Payment]](Some(this))(_.flatMap(p => p.next(interestRate, weeklyPayment)))
+      .takeWhile(_.isDefined).map(_.get)
 }
 
 object Payment {
   def startingAt(date: DateTime, start: Double) = Payment(date, start, 0, 0, 0)
-  def next(interestRate: Double, weeklyPayment: Double)(p: Payment): Option[Payment] = if (p.remaining <= 0) None else {
-    val interest = (p.remaining * interestRate) / 52.0
-    val paid = p.paid + min(weeklyPayment, p.remaining + interest)
-    val remaining = p.remaining - min(weeklyPayment - interest, p.remaining)
-    Some(Payment(p.date.plusWeeks(1), remaining, paid, interest, p.totalInterest + interest))
-  }
 }

@@ -1,6 +1,6 @@
 package ca.foc.play.io
 
-import scala.io.StdIn._
+import scala.io.StdIn
 import ca.foc.play.par.Par
 
 sealed trait Console[A] {
@@ -12,7 +12,7 @@ case object ReadLine extends Console[Option[String]] {
   def toPar = Par.lazyUnit(run)
   def toThunk = () => run
 
-  def run: Option[String] = try { Some(readLine()) } catch { case e: Exception => None }
+  def run: Option[String] = try { Some(StdIn.readLine()) } catch { case e: Exception => None }
 }
 
 case class PrintLine(line: String) extends Console[Unit] {

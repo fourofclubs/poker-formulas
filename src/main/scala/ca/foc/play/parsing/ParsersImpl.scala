@@ -1,6 +1,8 @@
 package ca.foc.play.parsing
 
-import scala.{ Left, Right }
+import scala.Left
+import scala.Right
+import scala.language.implicitConversions
 import scala.util.matching.Regex
 
 object ParsersImpl extends Parsers[Parser] {

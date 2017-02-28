@@ -13,13 +13,13 @@ class Integer(n: Nat, pos: Boolean) {
 object Integer {
   def apply(str: String, base: Nat): Integer = str.toList match {
     case List()    ⇒ new Integer(Zero, true)
-    case '-' :: cs ⇒ -Integer(cs mkString, base)
+    case '-' :: cs ⇒ -Integer(cs.mkString, base)
     case _         ⇒ new Integer(Nat(str, base), true)
   }
   def apply(str: String): Integer = str.toList match {
-    case '-' :: cs ⇒ -Integer(cs mkString)
-    case 'b' :: cs ⇒ Integer(cs mkString, Two)
-    case 'h' :: cs ⇒ Integer(cs mkString, Eight * Two)
+    case '-' :: cs ⇒ -Integer(cs.mkString)
+    case 'b' :: cs ⇒ Integer(cs.mkString, Two)
+    case 'h' :: cs ⇒ Integer(cs.mkString, Eight * Two)
     case _         ⇒ Integer(str, Ten)
   }
 }

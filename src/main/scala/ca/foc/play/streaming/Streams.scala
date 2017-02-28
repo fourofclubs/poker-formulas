@@ -1,9 +1,10 @@
 package ca.foc.play.streaming
 
+import scala.Stream
+import scala.collection.immutable.Stream.consWrapper
+
 import ca.foc.play.monads.Monad
-import java.io.File
-import ca.foc.play.io.IO
-import ca.foc.play.io.IO.TailRec
+import scalaz.effect.IO
 
 object Process {
   def liftOne[I, O](f: I => O): Process[I, O] = Await {
@@ -73,7 +74,7 @@ object Process {
       def flatMap[O, O2](p: Process[I, O])(f: O => Process[I, O2]): Process[I, O2] = p flatMap f
     }
   def exists[I](f: I => Boolean): Process[I, Boolean] = lift(f) |> takeThrough(!_)
-  def processFile[A, B](f: java.io.File, p: Process[String, A], z: B)(g: (B, A) => B): TailRec[B] = IO {
+  def processFile[A, B](f: java.io.File, p: Process[String, A], z: B)(g: (B, A) => B): IO[B] = IO {
     @annotation.tailrec
     def go(ss: Iterator[String], cur: Process[String, A], acc: B): B =
       cur match {

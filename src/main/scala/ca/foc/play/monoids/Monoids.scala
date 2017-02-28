@@ -4,6 +4,7 @@ import ca.foc.play.testing.Prop
 import ca.foc.play.testing.Prop._
 import ca.foc.play.testing.Gen
 import ca.foc.play.par.Par
+import scala.language.higherKinds
 
 trait Monoid[A] {
   def op(a1: A, a2: A): A

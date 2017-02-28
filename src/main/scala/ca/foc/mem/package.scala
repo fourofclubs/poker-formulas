@@ -1,6 +1,6 @@
 package ca.foc
 
-import scala.annotation.migration
+import scala.language.implicitConversions
 
 package object mem {
   sealed trait Suit
