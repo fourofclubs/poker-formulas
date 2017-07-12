@@ -4,6 +4,7 @@ import scala.language.implicitConversions
 
 object PokerFormulas {
   def findHand(d: Deck, h: Hand, players: Int): Option[DealInfo] = {
+    println(s"Finding '$h', for $players players.")
     def evaluate(players: Int, d: DealInfo): Int = (d.seconds.sum + (d.seconds.count(_ == 0) * players * 3))
     def find[C >: Card](d: Deck, ps: List[C ⇒ Boolean], players: Int): List[List[Int]] = ps match {
       case List() ⇒ List(List())
@@ -25,27 +26,19 @@ object PokerFormulas {
     }
     val deals = {
       for (
-        cut ← (0 to 51).par;
-        s ← h.searchers.par
+        cut ← (0 to 51);
+        s ← h.searchers
       ) yield (find(d.cut(cut), s, players)).map(DealInfo(cut, _))
     }.flatten
     if (deals.isEmpty) None else Some(deals.maxBy(evaluate(players, _)))
   }
-
-  case class Predicate[-A](p: A ⇒ Boolean) extends (A ⇒ Boolean) {
-    def apply(a: A) = p(a)
-    def &&[B <: A](p2: B ⇒ Boolean) = Predicate[B](a ⇒ p(a) && p2(a))
-    def ||[B <: A](p2: B ⇒ Boolean) = Predicate[B](a ⇒ p(a) || p2(a))
-    def unary_! = Predicate[A](a ⇒ !p(a))
-  }
-  implicit def functionToPredicate[A](p: A ⇒ Boolean): Predicate[A] = Predicate(p)
 
   val any = (c: Card) ⇒ true
   def isValue(v: CardVal) = (c: Card) ⇒ c.value == v
   def isSuit(s: Suit) = (c: Card) ⇒ c.suit == s
   def isCard(c: Card) = (c2: Card) ⇒ c2 == c
   def isCard(v: CardVal, s: Suit): Card ⇒ Boolean = isCard(Card(v, s))
-  def isLower(v: CardVal) = (c: Card) ⇒ c.value.intVal < v.intVal || (v == A && c.value != A)
+  def isLower(v: CardVal) = (c: Card) ⇒ (c.value.intVal < v.intVal || (v == A && c.value != A)) && c.value != A
   def inRange(n1: Int, n2: Int) = (c: Card) ⇒ (n1 to n2).contains(c.value.intVal)
 
   sealed trait Hand {
@@ -105,6 +98,7 @@ object PokerFormulas {
       cards.contains((J, s)) && cards.contains((v10, s))
   }
   val HANDS: Set[Hand] = {
+    println("Initializing hands.")
     (for (v1 ← VALUES; v2 ← VALUES; if (v1 != v2)) yield TwoPair(v1, v2)) ++
       (for (v ← VALUES) yield Trips(v)) ++
       (for (v ← VALUES; if v.intVal >= 5 || v == A) yield Straight(v)) ++
@@ -119,8 +113,11 @@ object PokerFormulas {
   case class DealInfo(cut: Int, seconds: List[Int])
 
   val seconds = (for (
-    players ← (3 to 10).par;
-    h ← HANDS.par;
+    players ← (4 to 10).par;
+    h ← HANDS;
     d ← findHand(MemDeck, h, players)
-  ) yield HandInfo(h, players) -> d).toMap
+  ) yield {
+    println(players)
+    HandInfo(h, players) -> d
+  }).toMap
 }

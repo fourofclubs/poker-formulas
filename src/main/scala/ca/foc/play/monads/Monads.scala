@@ -18,6 +18,7 @@ import scala.language.implicitConversions
 import ca.foc.play.par.Par
 import ca.foc.play.parsing.Parser
 import scala.collection.immutable.Iterable
+import scalaz.\/
 
 trait Functor[F[_]] {
   def map[A, B](fa: F[A])(f: A => B): F[B]

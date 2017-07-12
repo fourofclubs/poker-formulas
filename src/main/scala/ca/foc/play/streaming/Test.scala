@@ -5,6 +5,7 @@ import scala.language.implicitConversions
 
 import Process._
 import scalaz.effect.IO
+import scalaz.stream._
 import ca.foc.play.streaming.GeneralStreams.IOMonadCatch
 
 object Test extends App {
@@ -29,67 +30,20 @@ object Test extends App {
   //
   def toCelcius(fahrenheit: Double): Double = (5.0 / 9.0) * (fahrenheit - 32)
 
-  import ca.foc.play.streaming.GeneralStreams._
-  //  val file = new java.io.File("W:/2016-11-09-scala/git/scala-playground/temperature.txt")
-  //  val fileP = filter((s: String) => !s.isEmpty() && !s.startsWith("#")) |>
-  //    lift((s: String) => s.toDouble) |> lift(toCelcius)
-  //  println(fileP)
-  //  println(file)
-  //  val pf = processFile(file, fileP, List[Double]())(_ :+ _)
-  //  println(pf.unsafePerformIO())
-  //
-  //  import java.io.{ BufferedReader, FileReader }
-  //  val ioP: GeneralStreams.Process[IO, String] =
-  //    await(IO(new BufferedReader(new FileReader("lines.txt")))) {
-  //      case Right(b) =>
-  //        lazy val next: GeneralStreams.Process[IO, String] = await(IO(b.readLine)) {
-  //          case Left(e) => await(IO(b.close))(_ => Halt(e))
-  //          case Right(line) =>
-  //            if (line eq null) Halt(End)
-  //            else Emit(line, next)
-  //        }
-  //        next
-  //      case Left(e) => Halt(e)
-  //    }
-  //  val log = runLog(ioP)
-  //  println(log.unsafePerformIO())
-  //
-  //  println(ioP.runLog.unsafePerformIO())
-  //
-  //  println((lines("lines.txt") ++ lines("lines.txt")).runLog.unsafePerformIO())
-  //
-  //  val ioP2 = lines("lines.txt")
-  //  println(ioP2)
-  //
-  //  println(ioP2.runLog.unsafePerformIO())
-
-  //val converter = lines("temperature.txt").filter(_.startsWith("#"))
-
-  val f = GeneralStreams.filter[String] { x => true }
-  val r = resource(IO { io.Source.fromFile("temperature.txt") }) {
-    src =>
-      lazy val iter = src.getLines
-      def step = if (iter.hasNext) Some(iter.next) else None
-      lazy val lines: Process[IO, String] = eval(IO(step)).flatMap {
-        case None       => Halt(End)
-        case Some(line) => Emit(line, lines)
-      }
-      lines
-  } { src => eval_ { IO(src.close) } }
-  println(r.runLog.unsafePerformIO())
-
-  val t = liftOne[String, String] { _.toUpperCase() }
-
-  val s = r |> t
-  println(s.runLog.unsafePerformIO())
-
-  val u = lines("temperature.txt").
+  val task = io.linesR("temperature.txt").
     filter(!_.startsWith("#")).
-    map(line => toCelcius(line.toDouble).toString).
+    map(line => toCelcius(line.trim().toDouble).toString()).
+    to(io.stdOutLines).
+    drain.runLog
+  println(task.run)
+
+  import ca.foc.play.streaming.GeneralStreams._
+  val converter = lines("temperature.txt").
+    filter(!_.trim().startsWith("#")).
+    flatMap(s => eval(IO.putStrLn(s).map(_ => s))).
+    map(line => toCelcius(line.trim().toDouble).toString).
     pipe(intersperse("\n")).
     to(fileW("celsius.txt")).
     drain
-  try { println(u.runLog.unsafePerformIO()) } catch { case e: Any => println(e.getClass) }
-
-  //  println(converter.runLog.unsafePerformIO())
+  println(converter.runLog.unsafePerformIO())
 }

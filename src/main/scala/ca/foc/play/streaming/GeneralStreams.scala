@@ -56,10 +56,10 @@ object GeneralStreams {
     def repeat: Process[F, O] = this ++ this.repeat
     def |>[O2](p2: => Process1[O, O2]): Process[F, O2] = {
       p2 match {
-        case Halt(e)    => { println("? |> HALT"); this.kill onHalt { e2 => Halt(e) ++ Halt(e2) } }
+        case Halt(e)    => this.kill onHalt { e2 => Halt(e) ++ Halt(e2) }
         case Emit(h, t) => Emit(h, this |> t)
         case Await(req, recv) => this match {
-          case Halt(err)          => { println("HALT |> AWAIT"); Halt(err) |> recv(Left(err)) }
+          case Halt(err)          => Halt(err) |> recv(Left(err)).kill.onHalt { e2 => Halt(err) ++ Halt(e2) }
           case Emit(h, t)         => t |> Try(recv(Right(h)))
           case Await(req0, recv0) => await(req0)(recv0 andThen (_ |> p2))
         }
@@ -97,6 +97,8 @@ object GeneralStreams {
     def zipWith[O2, O3](p2: Process[F, O2])(f: (O, O2) => O3): Process[F, O3] =
       (this tee p2)(GeneralStreams.zipWith(f))
     def to[O2](sink: Sink[F, O]): Process[F, Unit] = join { (this zipWith sink)((o, f) => f(o)) }
+    def through[O2](p2: Channel[F, O, O2]): Process[F, O2] =
+      join { (this zipWith p2)((o, f) => f(o)) }
   }
 
   trait MonadCatch[F[_]] extends Monad[F] {
@@ -151,16 +153,16 @@ object GeneralStreams {
   }
   def eval_[F[_], A, B](a: F[A]): Process[F, B] = eval(a).drain[B]
 
-  def lines(filename: String): Process[IO, String] = resource(IO { println("Loading file"); io.Source.fromFile(filename) }) {
+  def lines(filename: String): Process[IO, String] = resource(IO(io.Source.fromFile(filename))) {
     src =>
       lazy val iter = src.getLines
       def step = if (iter.hasNext) Some(iter.next) else None
       lazy val lines: Process[IO, String] = eval(IO(step)).flatMap {
-        case None       => { println("EOF"); Halt(End) }
-        case Some(line) => { println(line); Emit(line, lines) }
+        case None       => Halt(End)
+        case Some(line) => Emit(line, lines)
       }
       lines
-  } { src => eval_ { println("closing file"); IO(src.close) } }
+  } { src => eval_(IO(src.close)) }
 
   def await1[I, O](recv: I => Process1[I, O], fallback: => Process1[I, O] = halt1[I, O]): Process1[I, O] =
     Await(Is[I].Get, (e: Either[Throwable, I]) => e match {
@@ -173,7 +175,7 @@ object GeneralStreams {
   def halt1[I, O]: Process1[I, O] = Halt[Is[I]#f, O](End)
   def liftOne[I, O](f: I => O): Process1[I, O] = await1[I, O](i => emit1(f(i)))
   def lift[I, O](f: I => O): Process1[I, O] = liftOne(f).repeat
-  def filter[I](f: I => Boolean): Process1[I, I] = await1[I, I](i => if (f(i)) { println("Not filtered"); emit1(i) } else { println("filtered"); halt1 }).repeat
+  def filter[I](f: I => Boolean): Process1[I, I] = await1[I, I](i => if (f(i)) emit1(i) else halt1).repeat
   def haltT[I, I2, O]: Tee[I, I2, O] = Halt[T[I, I2]#f, O](End)
   def awaitL[I, I2, O](recv: I => Tee[I, I2, O], fallback: => Tee[I, I2, O] = haltT[I, I2, O]): Tee[I, I2, O] =
     await[T[I, I2]#f, I, O](L) {
@@ -210,6 +212,7 @@ object GeneralStreams {
   def R[I, I2] = T[I, I2]().R
   type Process1[I, O] = Process[Is[I]#f, O]
   type Sink[F[_], O] = Process[F, O => Process[F, Unit]]
+  type Channel[F[_], I, O] = Process[F, I => Process[F, O]]
   type Tee[I, I2, O] = Process[T[I, I2]#f, O]
 
   def fileW(file: String, append: Boolean = false): Sink[IO, String] =

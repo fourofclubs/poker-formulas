@@ -1,33 +1,78 @@
 package ca.foc.mem
 
-import ca.foc.mem.PokerFormulas.HandInfo
-import ca.foc.mem.PokerFormulas.DealInfo
-import ca.foc.mem.PokerFormulas.FullHouse
-import java.io.File
-import java.io.PrintStream
+import java.io.{ File, PrintStream }
+
+import ca.foc.mem.PokerFormulas.{ DealInfo, Flush, FullHouse, HandInfo, Quads, Straight }
+import ca.foc.mem.PokerFormulas.StraightFlush
+import ca.foc.mem.PokerFormulas.RoyalFlush
 
 object PrintPF extends App {
   import PokerFormulas.seconds
 
   def fmt(h: HandInfo)(d: DealInfo) = s"${h.hand.toString}, ${h.players} : ${d.cut}-${d.seconds.mkString(",")}"
 
-  val sortedValues = VALUES.toList.sortBy(v ⇒ if (v == A) 14 else v.intVal).reverse
-  val t = for (v1 ← sortedValues) yield {
-    for (p ← 3 to 10) yield {
-      for (
-        v2 ← sortedValues.filterNot(_ == v1)
-      ) yield {
-        val h = HandInfo(FullHouse(v1, v2), p)
-        seconds.get(h).map(fmt(h)_).getOrElse("")
-      }
-    }.mkString("\t")
-  }.mkString("\n")
+  val values = VALUES.toList.sorted
+  
+  val fhs = for (
+    p <- 4 to 10;
+    v1 <- values;
+    v2 <- values
+  ) yield {
+    val hand = HandInfo(FullHouse(v1, v2), p)
+    seconds.get(hand).map(fmt(hand)_).getOrElse("")
+  }
 
-  val fh = new File("pokerFormulas-FH.csv")
-  fh.delete()
-  val pfh = new PrintStream(fh)
-  pfh.println(t.mkString("\n\n"))
+  val ss = for (
+    p <- 4 to 10;
+    v <- values
+  ) yield {
+    val hand = HandInfo(Straight(v), p)
+    seconds.get(hand).map(fmt(hand)_).getOrElse("")
+  }
 
-  for ((h, d) <- seconds.toList.sortBy(_._1.players).sortBy(_._1.hand.toString))
-    println(h.hand.toString + ", " + h.players + ": " + d.cut + "-" + d.seconds.mkString(","))
+  val fs = for (
+    p <- 4 to 10;
+    s <- SUITS;
+    v <- values
+  ) yield {
+    val hand = HandInfo(Flush(s, v), p)
+    seconds.get(hand).map(fmt(hand)_).getOrElse("")
+  }
+
+  val qs = for (
+    p <- 4 to 10;
+    v <- values
+  ) yield {
+    val hand = HandInfo(Quads(v), p)
+    seconds.get(hand).map(fmt(hand)_).getOrElse("")
+  }
+
+  val sfs = for (
+    p <- 4 to 10;
+    s <- SUITS;
+    v <- values
+  ) yield {
+    val hand = HandInfo(StraightFlush(s, v), p)
+    seconds.get(hand).map(fmt(hand)_).getOrElse("")
+  }
+
+  val rfs = for (
+    p <- 4 to 10;
+    s <- SUITS
+  ) yield {
+    val hand = HandInfo(RoyalFlush(s), p)
+    seconds.get(hand).map(fmt(hand)_).getOrElse("")
+  }
+
+  val pf = new File("pokerFormulas.csv")
+  pf.delete()
+  val ps = new PrintStream(pf)
+  ps.println(fhs.mkString("\n\n") + "\n\n")
+  ps.println(ss.mkString("\n\n") + "\n\n")
+  ps.println(fs.mkString("\n\n") + "\n\n")
+  ps.println(qs.mkString("\n\n") + "\n\n")
+  ps.println(sfs.mkString("\n\n") + "\n\n")
+  ps.println(rfs.mkString("\n\n") + "\n\n")
+
+  println("DONE")
 }

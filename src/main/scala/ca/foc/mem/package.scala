@@ -21,6 +21,9 @@ package object mem {
     def -(n: Int): CardVal = if (n < 0) this + (-n) else if (n == 0) this else (prev - (n - 1))
     def +(n: Int): CardVal = if (n < 0) this - (-n) else if (n == 0) this else (next + (n - 1))
   }
+  object CardVal {
+    def apply(intVal: Int) = valueIndex(intVal)
+  }
   object K extends CardVal { override def toString = "K"; val intVal = 13; val prev = Q; val next = A }
   object Q extends CardVal { override def toString = "Q"; val intVal = 12; val prev = J; val next = K }
   object J extends CardVal { override def toString = "J"; val intVal = 11; val prev = v10; val next = Q }
@@ -65,8 +68,15 @@ package object mem {
     (v9, C), (v7, D), (v4, S), (v6, D), (A, S), (J, H), (v6, C), (K, D), (v10, S), (Q, D), (v7, S), (v8, H), (v3, C),
     (J, C), (v3, D), (A, H), (v2, D)))
 
-  private val valueIndex = Map(1 -> A, 2 -> v2, 3 -> v3, 4 -> v4, 5 -> v5, 6 -> v6, 7 -> v7, 8 -> v8,
-    9 -> v9, 10 -> v10, 11 -> J, 12 -> Q, 13 -> K)
+  private val valueIndex = VALUES.map(v => v.intVal -> v).toMap
   implicit def toCard(c: (CardVal, Suit)): Card = Card(c._1, c._2)
   implicit def intToCard(c: (Int, Suit)): Card = Card(valueIndex(c._1), c._2)
+
+  case class Predicate[-A](p: A ⇒ Boolean) extends (A ⇒ Boolean) {
+    def apply(a: A) = p(a)
+    def &&[B <: A](p2: B ⇒ Boolean) = Predicate[B](a ⇒ p(a) && p2(a))
+    def ||[B <: A](p2: B ⇒ Boolean) = Predicate[B](a ⇒ p(a) || p2(a))
+    def unary_! = Predicate[A](a ⇒ !p(a))
+  }
+  implicit def functionToPredicate[A](p: A ⇒ Boolean): Predicate[A] = Predicate(p)
 }
