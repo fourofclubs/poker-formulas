@@ -21,9 +21,6 @@ package object mem {
     def -(n: Int): CardVal = if (n < 0) this + (-n) else if (n == 0) this else (prev - (n - 1))
     def +(n: Int): CardVal = if (n < 0) this - (-n) else if (n == 0) this else (next + (n - 1))
   }
-  object CardVal {
-    def apply(intVal: Int) = valueIndex(intVal)
-  }
   object K extends CardVal { override def toString = "K"; val intVal = 13; val prev = Q; val next = A }
   object Q extends CardVal { override def toString = "Q"; val intVal = 12; val prev = J; val next = K }
   object J extends CardVal { override def toString = "J"; val intVal = 11; val prev = v10; val next = Q }
