@@ -2,7 +2,7 @@ package ca.foc
 
 import scala.language.implicitConversions
 
-package object mem {
+package object pf {
   sealed trait Suit
   object Spades extends Suit { override def toString = "S" }
   object Hearts extends Suit { override def toString = "H" }

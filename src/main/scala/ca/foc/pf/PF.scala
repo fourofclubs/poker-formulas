@@ -1,4 +1,4 @@
-package ca.foc.mem
+package ca.foc.pf
 
 import scalaz.stream.Process
 import scalaz.stream.io
@@ -6,7 +6,7 @@ import scalaz.concurrent.Task
 import scalaz.\/
 import scalaz.-\/
 import scalaz.\/-
-import ca.foc.mem.PokerFormulas._
+import ca.foc.pf.PokerFormulas._
 import scala.io.StdIn
 import scala.collection.immutable.SortedMap
 import scalaz.effect.IO
