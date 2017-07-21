@@ -31,7 +31,7 @@ object PokerFormulas {
     if (deals.isEmpty) None else Some(deals.maxBy(evaluate(players, _)))
   }
 
-  val any = (c: Card) ⇒ true
+  val anyCard = (c: Card) ⇒ true
   def isValue(v: CardVal) = (c: Card) ⇒ c.value == v
   def isSuit(s: Suit) = (c: Card) ⇒ c.suit == s
   def isCard(c: Card) = (c2: Card) ⇒ c2 == c
@@ -57,7 +57,7 @@ object PokerFormulas {
   }
   case class Straight(highVal: CardVal) extends Hand {
     override def toString = s"S($highVal)"
-    val cards = List.range(0, 4).map(n => isValue(highVal - n))
+    val cards = List.range(0, 5).map(n => isValue(highVal - n))
     def verify(cards: List[Card]) = {
       val values = cards.groupBy(_.value).keys.toSet
       values.contains(highVal) && values.contains(highVal - 1) && values.contains(highVal - 2) &&
@@ -77,14 +77,12 @@ object PokerFormulas {
   }
   case class Quads(v: CardVal) extends Hand {
     override def toString = s"Q$v"
-    val cards = (any :: List.fill(4)(isValue(v)))
+    val cards = (anyCard :: List.fill(4)(isValue(v)))
     def verify(cards: List[Card]) = cards.count(_.value == v) == 4
   }
   case class StraightFlush(s: Suit, highVal: CardVal) extends Hand {
     override def toString = s"SF($s,$highVal)"
-    val cards =
-      if (highVal == A) isCard(A, s) +: List.fill(4)(inRange(10, 13))
-      else List.fill(5)(isSuit(s) && inRange(highVal.intVal - 4, highVal.intVal))
+    val cards = List.range(0, 5).map(n => isSuit(s) && isValue(highVal - n))
     def verify(cards: List[Card]) = cards.contains((highVal, s)) && cards.contains((highVal - 1, s)) &&
       cards.contains((highVal - 2, s)) && cards.contains((highVal - 3, s)) && cards.contains((highVal - 4, s))
   }

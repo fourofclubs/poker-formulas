@@ -1,22 +1,12 @@
 package ca.foc.pf
 
-import scalaz.stream.Process
-import scalaz.stream.io
-import scalaz.concurrent.Task
-import scalaz.\/
-import scalaz.-\/
-import scalaz.\/-
-import ca.foc.pf.PokerFormulas._
-import scala.io.StdIn
-import scala.collection.immutable.SortedMap
+import ca.foc.pf.PokerFormulas.{ DealInfo, Flush, FullHouse, Hand, Quads, Straight, StraightFlush, findHand }
+import scalaz.{ -\/ => -\/, \/ => \/, \/- => \/- }
 import scalaz.effect.IO
-import scalaz.effect.Effect
-import scalaz.syntax.traverse._
-import scalaz.std.list._
-import scalaz.Id
-import scalaz.syntax.std.string._
-import scalaz.syntax.std.StringOps
-import scalaz.syntax.std.StringOps._
+import scalaz.std.list.listInstance
+import scalaz.syntax.std.string.ToStringOpsFromString
+import scalaz.syntax.traverse.{ ToFunctorOps, ToTraverseOps }
+import ca.foc.pf.PokerFormulas.Trips
 
 object PF extends App {
   private def printOptions(options: Map[Int, String]) = {
@@ -76,10 +66,28 @@ sealed trait HandBuilder {
 }
 object BuildHand extends HandBuilder {
   private val builders =
-    Map(1 -> StraightBuilder, 2 -> FlushBuilder, 3 -> FullHouseBuilder, 4 -> QuadsBuilder, 5 -> StraightFlushBuilder)
+    Map(1 -> TwoPairBuilder, 2 -> TripsBuilder, 3 -> StraightBuilder, 4 -> FlushBuilder,
+      5 -> FullHouseBuilder, 6 -> QuadsBuilder, 7 -> StraightFlushBuilder)
   val prompt = "Please select a hand."
   def options = builders.mapValues(_.toString)
   def select(opt: Int) = -\/(builders(opt))
+}
+object TwoPairBuilder extends HandBuilder {
+  override def toString = "Two Pair"
+  val prompt = "First Value?"
+  def options = valueMap.mapValues(_.toString)
+  def select(opt: Int): (HandBuilder \/ Hand) = -\/(new TwoPairBuilder2(valueMap(opt)))
+}
+private final class TwoPairBuilder2(v1: CardVal) extends HandBuilder {
+  val prompt = "Second Value?"
+  def options = valueMap.filter(_._2 != v1).mapValues(_.toString)
+  def select(opt: Int): (HandBuilder \/ Hand) = -\/(new TwoPairBuilder2(valueMap(opt)))
+}
+object TripsBuilder extends HandBuilder {
+  override def toString = "Three of a Kind"
+  val prompt = "Value?"
+  def options = valueMap.mapValues(_.toString)
+  def select(opt: Int) = \/-(Trips(valueMap(opt)))
 }
 object StraightBuilder extends HandBuilder {
   override def toString = "Straight"
